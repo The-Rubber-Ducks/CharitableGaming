@@ -7,7 +7,7 @@ get_puuid(user: str, region: str)
 
     returns:    string 
 
-get_matchlist(user: str, matchid: str, region: str, num_matches: int)
+get_matchlist(user: str, region: str, num_matches: int)
     Get the match IDs for a specified number of games
 
     parameters: user (string) -- The summoner name of the user
@@ -35,22 +35,28 @@ platform_to_regional(region: str)
     parameters: region (string) -- The full name of the region (e.g., "North America")
 
     returns: string
+
+
+Example usage:
+
+    puuid = get_puuid("Topo", "North America") # Get the puuid of the player 
+
+    last_five_matches = get_matchlist(puuid, "North America", 5) # Get the IDs of last 5 matches
+
+    stats = get_player_match_stats(puuid, "North America", last_match_id, "kills", "deaths", "assists") # Get the player's kills, deaths, and assists for the last 5 matches
+
+    stats_2 = get_player_match_stats(puuid, "North America", last_match_id, "champLevel", "damageDealtToTurrets")) # You can get other stats as well
+
 """
 
 from riotwatcher import LolWatcher, ApiError
 from datetime import datetime
 from dotenv import load_dotenv
-import pprint
 import os
-
-pp = pprint.PrettyPrinter(indent=4)
 
 load_dotenv()
 YOUR_RIOT_API_KEY = os.environ['YOUR_RIOT_API_KEY']
 lol_watcher = LolWatcher(YOUR_RIOT_API_KEY)
-
-EXAMPLE_USERNAME = 'TFBlade2'
-EXAMPLE_REGION = 'North America'
 
 
 def get_puuid(user, region):
@@ -79,7 +85,6 @@ def get_puuid(user, region):
     return player['puuid']
 
 
-# returns a list of match IDs for a specified number of matches
 def get_matchlist(puuid, region, num_matches=1):    
     region = platform_to_regional(region)
     return lol_watcher.match.matchlist_by_puuid(region, puuid, count=num_matches)
@@ -119,9 +124,3 @@ def platform_to_regional(region):
         return 'ASIA'
     else:
         return 'EUROPE'
-
-
-puuid = get_puuid(EXAMPLE_USERNAME, EXAMPLE_REGION)
-last_match_id = get_matchlist(puuid, EXAMPLE_REGION, 5)
-pp.pprint(get_player_match_stats(puuid, EXAMPLE_REGION, last_match_id, "kills", "deaths", "assists"))
-pp.pprint(get_player_match_stats(puuid, EXAMPLE_REGION, last_match_id, "champLevel", "damageDealtToTurrets"))
