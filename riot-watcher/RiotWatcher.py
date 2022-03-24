@@ -18,7 +18,7 @@ get_matchlist(user, matchid, region, num_matches)
     returns:    list
 
 get_player_match_stats(puuid, matches, region, [stats]):
-    Get the stats for a list of stats for any single player
+    Get the stats for a list of matches for any given player
 
     parameters: user (string) -- The summoner name of the user
                 matches (list) -- List of match IDs
