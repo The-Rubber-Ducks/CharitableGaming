@@ -7,7 +7,7 @@ get_puuid(user: str, region: str)
 
     returns:    string 
 
-get_matchlist(user, matchid, region, num_matches)
+get_matchlist(user: str, matchid: str, region: str, num_matches: int)
     Get the match IDs for a specified number of games
 
     parameters: user (string) -- The summoner name of the user
@@ -17,7 +17,7 @@ get_matchlist(user, matchid, region, num_matches)
 
     returns:    list
 
-get_player_match_stats(puuid, matches, region, [stats]):
+get_player_match_stats(puuid: str, matches: list, region: str, [stats]: list):
     Get the stats for a list of matches for any given player
 
     parameters: user (string) -- The summoner name of the user
@@ -29,7 +29,7 @@ get_player_match_stats(puuid, matches, region, [stats]):
 
     returns:    dictionary
 
-platform_to_regional(region)
+platform_to_regional(region: str)
     Helper function thatconverts platform routing values to regional routing values (check the Riot API docs for more info)
 
     parameters: region (string) -- The full name of the region (e.g., "North America")
