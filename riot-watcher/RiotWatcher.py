@@ -25,7 +25,7 @@ get_player_match_stats(puuid: str, matches: list, region: str, [stats]: list):
                 region (string) -- The full name of the region (e.g., "North America")
                 
 
-    parameters (optional): stats (list[string]) -- List of stats (ParticipantDTO properties listed in the Riot API docs)
+    parameters (optional): stats (list[string]) -- List of stats (ParticipantDTO properties listed in the Riot API docs: https://developer.riotgames.com/apis#match-v5/GET_getMatch)
 
     returns:    dictionary
 
@@ -43,9 +43,11 @@ Example usage:
 
     last_five_matches = get_matchlist(puuid, "North America", 5) # Get the IDs of last 5 matches
 
-    stats = get_player_match_stats(puuid, "North America", last_match_id, "kills", "deaths", "assists") # Get the player's kills, deaths, and assists for the last 5 matches
+    stats = get_player_match_stats(puuid, "North America", last_five_matches, "kills", "deaths", "assists") # Get the player's kills, deaths, and assists for the last 5 matches
 
-    stats_2 = get_player_match_stats(puuid, "North America", last_match_id, "champLevel", "damageDealtToTurrets")) # You can get other stats as well
+    stats_2 = get_player_match_stats(puuid, "North America", last_five_matches, "champLevel", "damageDealtToTurrets") # You can get other stats as well
+
+    print(stats) 
 
 """
 
