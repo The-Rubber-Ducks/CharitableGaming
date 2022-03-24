@@ -54,12 +54,14 @@ Example usage:
 from riotwatcher import LolWatcher, ApiError
 from datetime import datetime
 from dotenv import load_dotenv
+import pprint
 import os
 
 load_dotenv()
 YOUR_RIOT_API_KEY = os.environ['YOUR_RIOT_API_KEY']
 lol_watcher = LolWatcher(YOUR_RIOT_API_KEY)
 
+pp = pprint.PrettyPrinter(indent=4)
 
 def get_puuid(user, region):
     regions = {
@@ -107,8 +109,6 @@ def get_player_match_stats(puuid, region, matches, *args):
         participants = match_dto['info']['participants']
         player = list(filter(lambda item: item['puuid'] == puuid, participants))[0] # filters the list of participant objects to find our player
         for arg in args:
-            if not player[arg]:
-                player[arg] = 0
             player_match_stats[arg] = player[arg]
         all_player_match_stats[match] = player_match_stats
         # all_player_match_stats[match_date] = player_match_stats
