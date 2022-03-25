@@ -1,0 +1,81 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "test_user1",
+      "profile_picture": "/some/path/to/a/file",
+      "created_at": "01-01-2020",
+      "charity_points": 10000,
+      "user_region": "North America",
+      "charity": 3
+    },
+    {
+      "id": 2,
+      "username": "test_user2",
+      "profile_picture": "/some/path/to/a/file",
+      "created_at": "01-01-2020",
+      "charity_points": 10000,
+      "user_region": "North America",
+      "charity": 1
+    },
+    {
+      "id": 3,
+      "username": "test_user3",
+      "profile_picture": "/some/path/to/a/file",
+      "created_at": "01-01-2020",
+      "charity_points": 10000,
+      "user_region": "North America",
+      "charity": 1
+    }
+  ],
+  "charities": [
+    {
+      "name": "Pencils of Promise",
+      "description": "Pencils of Promise (\"PoP\") is a 501(c)(3) nonprofit organization that believes every child deserves access to quality education. We create schools, programs and global communities around the common goal of education for all.",
+      "category": "Education & Youth",
+      "location": "Philadelphia, Pennsylvania",
+      "year": "2008",
+      "id": 1
+    },
+    {
+      "name": "Pencils of Promise",
+      "description": "Pencils of Promise (\"PoP\") is a 501(c)(3) nonprofit organization that believes every child deserves access to quality education. We create schools, programs and global communities around the common goal of education for all.",
+      "category": "Education & Youth",
+      "location": "Philadelphia, Pennsylvania",
+      "year": "2008",
+      "id": 2
+    },
+    {
+      "name": "Pencils of Promise",
+      "description": "Pencils of Promise (\"PoP\") is a 501(c)(3) nonprofit organization that believes every child deserves access to quality education. We create schools, programs and global communities around the common goal of education for all.",
+      "category": "Education & Youth",
+      "location": "Philadelphia, Pennsylvania",
+      "year": "2008",
+      "id": 3
+    },
+    {
+      "name": "Pencils of Promise",
+      "description": "Pencils of Promise (\"PoP\") is a 501(c)(3) nonprofit organization that believes every child deserves access to quality education. We create schools, programs and global communities around the common goal of education for all.",
+      "category": "Education & Youth",
+      "location": "Philadelphia, Pennsylvania",
+      "year": "2008",
+      "id": 4
+    },
+    {
+      "name": "Pencils of Promise",
+      "description": "Pencils of Promise (\"PoP\") is a 501(c)(3) nonprofit organization that believes every child deserves access to quality education. We create schools, programs and global communities around the common goal of education for all.",
+      "category": "Education & Youth",
+      "location": "Philadelphia, Pennsylvania",
+      "year": "2008",
+      "id": 5
+    },
+    {
+      "name": "Pencils of Promise",
+      "description": "Pencils of Promise (\"PoP\") is a 501(c)(3) nonprofit organization that believes every child deserves access to quality education. We create schools, programs and global communities around the common goal of education for all.",
+      "category": "Education & Youth",
+      "location": "Philadelphia, Pennsylvania",
+      "year": "2008",
+      "id": 6
+    }
+  ]
+}
