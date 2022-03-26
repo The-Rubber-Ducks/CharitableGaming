@@ -26,45 +26,50 @@ code {
   transform: translate(-50%, -50%);
   }
 
-.container {
-  
-}
 
 .charities-table {
   max-height: 70vh;
-  width: 700px;
-  overflow:auto;
+  // width: 700px;
+  // height: 1000px;
+  overflow: auto;
   border: 0.5px solid gray;
   border-radius: 0.2em;
+
+    .charity-filter {
+     max-width: 98%;
+    }
 
     .charity-info {
       margin: 2em;
       padding: 10px 16px;
       margin: 20px 0;
       border-bottom: 1px solid #fafafa;
-    }
 
+      h2 {
+        font-size: 20px;
+        color: #f1356d;
+        margin-bottom: 8px;
+      }
+    }
 
     .charity-info:hover {
       box-shadow: 1px 3px 5px rgba(0, 0, 0, 0.1);
     }
 
-    .charity-info h2 {
-      font-size: 20px;
-      color: #f1356d;
-      margin-bottom: 8px;
+    .charity-secondary-info,
+    .select-charity-btn {
+      align-self: center;
     }
 
     .charity-secondary-info p {
-        margin-bottom: .2em;
-      }
+      margin-bottom: .2em;
+    }
 
     .charity-btn {
       margin: auto;
     }
-
-    .charity-secondary-info,
-    .select-charity-btn {
-      align-self: center;
+    .selected {
+      font-size: .9em;
+      padding: .55em .35em;
     }
 }

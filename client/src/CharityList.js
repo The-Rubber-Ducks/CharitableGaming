@@ -2,13 +2,31 @@ import Button from 'react-bootstrap/Button';
 import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
-import Accordion from "react-bootstrap/Accordion";
-import { useState, useEffect} from 'react';
+import Form from 'react-bootstrap/Form';
+import InputGroup from 'react-bootstrap/InputGroup';
+import { useState, useEffect, useRef } from 'react';
 
-const CharityList = ({ charities, handleUpdate, selectedCharity }) => {
+const CharityList = ({ charities, handleUpdate, selectedCharity, searchTerm, handleSearch }) => {
+
+    const inputElement = useRef("");
+    const getSearchTerm = () => {
+        handleSearch(inputElement.current.value);
+    };
 
     return (  
         <Container className="charities-table centered">
+            <InputGroup>
+            <Form.Control 
+                ref={ inputElement }
+                className="charity-filter m-3" 
+                type="text" 
+                placeholder="Search Charities" 
+                value={ searchTerm } 
+                onChange={ getSearchTerm }
+            />
+            </InputGroup>
+
+
             {charities.map(charity => (
                 <Row className="charity-info" key = { charity.id }>
                     <Col xs={8} className="charity-primary-info"> 
@@ -20,14 +38,14 @@ const CharityList = ({ charities, handleUpdate, selectedCharity }) => {
                         <p>{ charity.location }</p>  
                     </Col>
                     <Col xs={1} className="select-charity-btn"> 
-                        <Button variant={(charity.id === selectedCharity) ? "primary" : "warning"}
-                                className="charity-btn"
+                        <Button 
+                                variant={(charity.id === selectedCharity) ? "primary" : "warning"}
+                                className={(charity.id === selectedCharity) ? "selected" : ""}
                                 onClick={() => {
                                     handleUpdate(charity.id);
-                
                                 }}>
                             {(charity.id === selectedCharity) ? "Selected" : "Select"}
-                            </Button>
+                        </Button>                        
                     </Col>
                 </Row>
             ))}

@@ -4,7 +4,7 @@ import Home from './Home'
 import Charities from './Charities';
 // import { BrowserRouter, Routes, Route} from 'react-router-dom';
 
-function App() {
+function App() {  
   return (
       <div className="App">
           <Charities />

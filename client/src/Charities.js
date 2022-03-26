@@ -2,8 +2,17 @@ import {useState, useEffect} from 'react';
 import CharityList from './CharityList';
 import useFetch from './useFetch';
 const Charities = () => {
-    const currentUserID = 1;
-    const { data: charities, isPending, error } = useFetch('http://localhost:8000/charities');
+    const [ searchTerm, setSearchTerm ] = useState("");
+    const [ searchResults, setSearchResults ] = useState([]);
+
+    // fetch list of all charities
+    // const { data: charities, isPending, error } = useFetch('http://localhost:8000/charities');
+    const [ charities, setCharities ] = useState(null);
+    const [ charitiesPending, setCharitiesPending ] = useState(true);
+    const [ charitiesError, setCharitiesError] = useState(null);
+
+    // user info
+    const currentUserID = 1; // dummy data
     const [ userID, setUserID ] = useState(null);
     const [ username, setUsername ] = useState(null);
     const [ profilePicture, setProfilePicture] = useState(null);
@@ -15,6 +24,7 @@ const Charities = () => {
     useEffect(() => {
         fetch(`http://localhost:8000/users/${currentUserID}`)
             .then(res => {
+                if (!res.ok) throw("Error fetching data for charities");
                 return res.json();
             })
             .then(user => {
@@ -25,9 +35,22 @@ const Charities = () => {
                 setCharityPoints(user.charity_points);
                 setUserRegion(user.user_region);
                 setSelectedCharity(user.charity);
+                setCharitiesPending(false);
+                setCharitiesError(null);
             })
-    }, []);
+            .catch(err => {
+                setCharitiesError(err.message);
+                setCharitiesPending(false);
+            })
 
+        fetch('http://localhost:8000/charities')
+        .then(res => {
+            return res.json();
+        })
+        .then(charities => {
+            setCharities(charities);
+        })
+    }, []);
 
     const handleUpdate = (id) => {
         setSelectedCharity(id);
@@ -46,13 +69,33 @@ const Charities = () => {
         })
     };
 
+    const handleSearch = (searchTerm) => {
+        setSearchTerm(searchTerm);
+        if (searchTerm !== "") {
+            const newCharityList = charities.filter((charity) => {
+                return charity.name.toLowerCase().includes(searchTerm.toLowerCase());
+            });
+            setSearchResults(newCharityList);
+            
+        } else {
+            setSearchResults(charities);
+        }
+    };
+
     return (  
         <div className="content">
             <h2>Our Patrons</h2>
-            { error && <div className="">{ error }</div> }
-            { isPending && <div className="">Loading...</div> }
-            { selectedCharity && charities && <CharityList charities={ charities } 
-                title="Our Patrons" handleUpdate={handleUpdate} selectedCharity={selectedCharity}/> }
+            { charitiesError && <div className="">{ charitiesError }</div> }
+            { charitiesPending && <div className="">Loading...</div> }
+            { selectedCharity && charities && 
+            <CharityList 
+                charities={ (searchResults.length < 1) ? charities : searchResults } 
+                title="Our Patrons" 
+                handleUpdate={ handleUpdate }  
+                selectedCharity={ selectedCharity } 
+                searchTerm={ searchTerm } 
+                handleSearch={ handleSearch }
+            /> }
         </div>
     );
 }
