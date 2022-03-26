@@ -1,33 +1,47 @@
 """
-Contains functionality for CRUD operations through the FireStore database.
-For most of the functionality, a user needs to be set, ideally on login to the website.
+Contains functionality for authenticating a user through Google Auth and Firebase, and CRUD operations 
+through the Google FireStore.
+For most of the functionality, a user needs to be authenticated, ideally on login to the website.
 
-To use these, import the FireStoreDB class. 
-To catch any exceptions where the user might not be logged in, import the CurrentUserNotSet exception.
+To use these, import the FirebaseFuncs class. 
 
-Create a new instance of the FireStoreDB class to have access to the FireStoreDB. This only needs to be performed once.
-When a new user is registered, call the FireStoreDB object's add_user class. Following is an example:
+Create a new instance of the FirebaseFuncs class to create a connection to the FireStore services. 
+This only needs to be performed once.
 
-db = FireStormDB()
-user_added = db.add_user("MyUsername", "MyPassword)
+Login and registration are assumed to occur using a user's email and password. 
+Additionally, on first registration, a user provides their player handles for the specified games. 
+An example of this would look like this:
 
-add_user checks if the username has already been taken or not.
+	fbase = FirebaseFuncs()
+	fbase.add_new_user_email_and_password("bob@example.com", "password")
+	fbase.authenticate_user("bob@example.com", "password")
+	fbase.set_user_player_id("my_gamer_handle", game_name="League of Legends")
+	fbase.add_charity("My Charity")
+	fbase.set_user_charity("My Charity")
 
-If, for instance, a user wants to log in, you would call the check_for_user method to verify that user's username exist,
-and that the password hash matches for the given user.
+A User's token that is provided on authentication with Firebase does expire (default after 1 hr, or 3600 seconds).
+Any method that requires the user to be authenticated will verify that the user's token has not yet expired.
 
-Once a user is logged, it is imperative to call the set_current_user function, as all other functionality
-included in the class requires the current user's data.
+Check the FirebaseFuncs class's documentation for  additional functionality.
 
-Check the FireStoreDB class's documentation for the additional functionality.
+Credentials for the Firebase project are required in a file called 'key.json' that should be stored in the same dir as this file.
+The API key for the Google Authentication service (the WebAPI) must be stored in a .env file in the same dir as this file.
 """
-
 import firebase_admin
-from firebase_admin import firestore
+from firebase_admin import firestore, auth
+from firebase_admin._auth_utils import InvalidIdTokenError, UserDisabledError
+from firebase_admin._token_gen import ExpiredIdTokenError, RevokedIdTokenError, CertificateFetchError
 from firebase_admin import exceptions as db_exceptions
-from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime
 from functools import wraps
+import requests
+from dotenv import load_dotenv
+from os import environ, path
+
+basedir = path.abspath(path.dirname(__file__))
+load_dotenv(path.join(basedir, ".env"))
+
+API_KEY = environ.get('API_KEY')
 
 class CurrentUserNotSet(Exception):
 	"""
@@ -38,36 +52,74 @@ class CurrentUserNotSet(Exception):
 	def __init__(self, message):
 		super().__init__(message)
 
-def is_current_user_set(func):
+class UserAuthenticationError(Exception):
 	"""
-	Checks if the current user is set (i.e. logged in) before performing the wrapped function.
-	Used in FireStoreDB objects.
+	Occurs when the google auth API receives an invalid response from the API.
+	"""
+	def __init__(self, message):
+		super().__init__(message)
+
+class UserTokenError(Exception):
+	"""
+	Raised if the current user's token cannot be verified.
+	"""
+	pass
+
+def _is_current_user_set_or_expired(func):
+	"""
+	Checks if the current user id is set (i.e. logged in).
+	Checks if the current user's token is still valid. 
+	If still valid, performs the wrapped function.
+	Used to wrap functions that require authentication within the FirebaseFuncs instances.
 	"""
 	@wraps(func)
-	def wrapper(*args, **kwargs):
-		if args[0].current_username is None:
+	def wrapper(self, *args, **kwargs):
+		if self._current_user_uid is None:
 			raise CurrentUserNotSet("Please set current user.")
 		
 		else:
-			return func(*args, **kwargs)
+			try:
+				self._auth.verify_id_token(self._current_user_idToken)
+
+			except ValueError as e:
+				raise UserTokenError("Id token not a string or is not empty.") from e
+
+			except InvalidIdTokenError as e:
+				raise UserTokenError("ID Token invalid.") from e
+
+			except ExpiredIdTokenError as e:
+				raise UserTokenError("ID Token has expired.") from e
+			
+			except RevokedIdTokenError as e:
+				raise UserTokenError("ID Token has been revoked.") from e
+
+			except CertificateFetchError as e:
+				raise UserTokenError("Error occured while fetching public key certificates.") from e
+
+			except UserDisabledError as e:
+				raise UserTokenError("User has been disabled.") from e
+
+			else:
+				return func(self, *args, **kwargs)
 
 	return wrapper
 
-class FirestoreDB:
+class FirebaseFuncs:
 	"""
 	Class represents a connection to the FireStore database for the CharitableGaming project.
-	Contains method to:
+	Contains methods to:
 		Set the current user, whoever is logged in
-		Add a user
-		Verify a user is in the database
+		Add a new user
+		Authenticate and login a user
 		Add points to a user's CharityPoints
-		Set a player's ID for LeagueOfLegends
-		Get the player's ID for LeagueOfLegends
+		Set a player's ID (default for LeagueOfLegends)
+		Get the player's ID (default for LeagueOfLegends)
 		Set a user's charity
 		Add a Charity	
 		Add LeagueOfLegends matches
 
-	Credentials for the database are required in a file called 'key.json' that should be stored in the same dir as this file.
+	Credentials for the Firebase project are required in a file called 'key.json' that should be stored in the same dir as this file.
+	The API key for the Google Authentication service (the WebAPI) must be stored in a .env file in the same dir as this file.
 	"""
 
 	def __init__(self) -> None:
@@ -79,10 +131,15 @@ class FirestoreDB:
 		self._cred = firebase_admin.credentials.Certificate('key.json')
 		self._db_app = firebase_admin.initialize_app(self._cred)
 		self._db = firestore.client()
-		self.current_username = None
+		self._auth = auth
+		self._current_user_uid = None
 		self._current_user_object = None
+		self._current_user_logged_in_time = None
+		self._seconds_until_user_expires = None
+		self._current_user_idToken = None
 
-	def set_current_user(self, username: str):
+		
+	def _set_current_user(self, user_id: str):
 		"""
 		Stores the current user's username and the user's FireStore object.
 		Should be called on login to the website to set the current user.
@@ -90,78 +147,138 @@ class FirestoreDB:
 		Args:
 			username (str): Current user's username.
 		"""
-		self.current_username = username
-		self._current_user_object = self._db.collection('users').document(f'{self.current_username}').get()
+		self._current_user_uid= user_id
+		self._current_user_object = self._db.collection('users').document(f'{user_id}').get()
 
-	def add_user(self, username: str, password: str) -> bool:
+
+	def add_new_user_email_and_password(self, email: str, password: str) -> bool:
 		"""
-		Adds a user to the database.
-		First verifies that a user with that username does not already exist.
+		Adds a user for authentication using their email and password.
+		Once the user is authenticated, a User ID (uid) is given that is unique to that user.
+		This creates a user specific document in FireStore by interacting with add_user_to_firestore method.
 
-		Encrypts and salts the given password string.
+		Args:
+			email (str): User's email to add to the authentication
+			password (str): User's raw string password to add to Firebase authentication
+
+		Raises:
+			firebase_admin.auth.EmailAlreadyExistsError: If the given email already exists
+
+		Returns:
+			bool: True on success
+		"""
+		new_user_record = self._auth.create_user(
+			email=email,
+			password=password,
+			email_verified=False
+		)
+		user_id = new_user_record.uid
+		self._add_user_to_firestore(user_id)
+
+		return True
+
+
+	def authenticate_user(self, email: str, password: str) -> dict:
+		"""
+		Signs in a user using the Google auth API endpoint, with the user's email and password.
+		If a successful response from the API, provides their Auth ID token, their refresh Token, and in how many seconds
+		the ID token expires. 
+
+		Args:
+			email (str): User's email
+			password (str): User's raw password
+
+		Raises:
+			UserAuthenticationError: Raised if the API response for Google Auth sign in fails. Includes message for
+										what the error was. Possible failures include incorrect password or user not found.
+
+		Returns:
+			dict: Dictionary containing the following parameters:
+				idToken (str): A Firebase Auth ID token for the authenticated user.
+				refreshToken (str): A Firebase Auth refresh token for the authenticated user.
+				expiresIn (int): The number of seconds in which the ID token expires
+				currentTime (str): The current time as a datetime object
+		"""
+		LOGIN_ENDPOINT = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key="
+		data = {
+			"email": email,
+            "password": password,
+            "returnSecureToken": True
+		}
+		result = requests.post(LOGIN_ENDPOINT + API_KEY, json=data)
+
+		if not result.ok:
+			error = result.json()['error']
+			raise UserAuthenticationError(message=f"{error['code']}: {error['message']}")
+
+		response = result.json()
+		uid = response['localId']
+		self._set_current_user(uid)
+
+		self._current_user_logged_in_time = datetime.utcnow()
+		self._seconds_until_user_expires = int(response['expiresIn'])
+		self._current_user_idToken = response['idToken']
+
+		session_info = {
+			'idToken': response['idToken'],
+			'refreshToken': response['refreshToken'],
+			'expiresIn': int(response['expiresIn']),
+			'currentTime': self._current_user_logged_in_time
+		}
+
+		return session_info
+
+
+	def logout_user(self):
+		"""
+		Logs out the user by dumping all of the current user's data stored in this object.
+		Revokes all user's currently set refresh tokens so they'd have to reauthenticate to log in.
+		Note - this does not invalidate the idToken provided by Firebase. Any instance of the
+		token that is still available can be used for authentication still.
+
+		No method currently to invalidate the tokens provided by Google.
+		"""
+		self._auth.revoke_refresh_tokens(self._current_user_uid)
+		self._current_user_uid = None
+		self._current_user_object = None
+		self._current_user_logged_in_time = None
+		self._seconds_until_user_expires = None
+		self._current_user_idToken = None
+
+
+	def _add_user_to_firestore(self, user_id: str):
+		"""
+		Adds a user document to firestore based on the unique authentication id.
+
 		Defaults user region to 'North America'.
 		Defaults user's charity to an empty string.
 		Defaults charity points to 0.
 
 		Args:
-			username (str): Given user's username
-			password (str): Users raw string password
+			user_id (str): Given user's user id from authentication.
 
 		Raises:
-			firebase_admin.exceptions.NotFoundError: User was not found.
+			firebase_admin.exceptions.AlreadyExistsError: User document already exists.
 
-		Returns:
-			True (bool): If user successfully created
 		"""
-		previous_user = self._db.collection('users').document(f'{username}').get()
+		previous_user = self._db.collection('users').document(f'{user_id}').get()
 
 		if previous_user.exists:
-			# User does not exist
-			raise db_exceptions.NotFoundError('User not found.')
+			# User document already exists for that ID.
+			raise db_exceptions.AlreadyExistsError('User already exists with that unique id.')
 
-		new_user = self._db.collection('users').document(f'{username}')
-		hashed_password = generate_password_hash(password)
+		new_user = self._db.collection('users').document(f'{user_id}')
 		current_time = datetime.utcnow()
 
 		new_user.set({
-			'username': f'{username}',
-			'password': f'{hashed_password}',
 			'user_region': 'North America',
 			'charity_points': 0,
 			'created_at': current_time.strftime("%m/%d/%Y %H:%M:%S"),
 			'charity': ''
 		})
 
-		return True
 
-	def check_for_user(self, username: str, password: str) -> bool:
-		"""
-		Checks if the given user exists in the database.
-
-		Args:
-			username (str): Username of the user to check for
-			password (str): Password of the user to check for
-
-		Raises:
-			firebase_admin.exceptions.NotFoundError: User was not found.
-
-		Returns:
-			bool: True if password matches, False if not
-		"""
-		user = self._db.collection('users').document(f'{username}').get()
-		
-		if user.exists:
-			user_dict = user.to_dict()
-
-			if check_password_hash(user_dict['password'], password):
-				return True
-			else:
-				return False
-
-		else:
-			raise db_exceptions.NotFoundError('User not found.')
-
-	@is_current_user_set
+	@_is_current_user_set_or_expired
 	def add_points_to_current_user(self, points_to_add: int) -> bool:
 		"""
 		Adds points to the current user's Charity Points.
@@ -184,7 +301,8 @@ class FirestoreDB:
 
 		return True
 
-	@is_current_user_set
+
+	@_is_current_user_set_or_expired
 	def set_user_player_id(self, player_id: str, game_name: str="League of Legends") -> bool:
 		"""
 		Sets a user's player id for a game. This field can be updated as many times as the user sees fit
@@ -229,7 +347,8 @@ class FirestoreDB:
 
 		return True
 
-	@is_current_user_set
+
+	@_is_current_user_set_or_expired
 	def get_user_player_id(self, game_name: str="League of Legends") -> str:
 		"""
 		Gets the user's player ID for the requested game. Access to the game API is available through the player's ID.
@@ -257,7 +376,8 @@ class FirestoreDB:
 
 		return player_id[0].to_dict()['playerID']
 
-	@is_current_user_set	
+
+	@_is_current_user_set_or_expired	
 	def set_user_charity(self, charity_name: str) -> bool:
 		"""
 		Checks if charity exists.
@@ -288,7 +408,8 @@ class FirestoreDB:
 			# Charity did not exist
 			raise db_exceptions.NotFoundError('Charity not found.')
 
-	@is_current_user_set
+
+	@_is_current_user_set_or_expired
 	def add_charity(self, charity_name: str) -> bool:
 		"""
 		Adds a charity with the given name to the database, as long as it doesn't already exist.
@@ -320,7 +441,8 @@ class FirestoreDB:
 		else:
 			raise db_exceptions.AlreadyExistsError('Charity already exists.')
 
-	@is_current_user_set
+
+	@_is_current_user_set_or_expired
 	def add_league_matches(self, player_id: str, match_data: dict) -> bool:
 		"""
 		Adds match data to the database for the current user.
@@ -363,6 +485,8 @@ class FirestoreDB:
 		batch = self._db.batch()
 		current_time = datetime.utcnow()
 
+		charity_points = 0
+
 		for match in match_data:
 			current_match = match_data[match]
 			new_match_id_for_db = self._db.collection('leaguestats').document()
@@ -376,8 +500,15 @@ class FirestoreDB:
 				'added_at': current_time.strftime("%m/%d/%Y %H:%M:%S")
 			})
 
-			# Can add to user's charity points here
-		
+			current_match_charity_points = 2 * current_match['kills'] + current_match['assists'] - 0.5 * current_match['deaths']
+
+			if current_match['win']:
+				current_match_charity_points *= 2
+			
+			charity_points += current_match_charity_points
+
 		batch.commit()
+
+		self.add_points_to_current_user(round(charity_points))
 
 		return True
