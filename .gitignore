@@ -2,3 +2,8 @@
 **/.env
 **/env3.9
 **/__pycache__
+venv
+.vscode
+key.json
+tester.py
+**/.pyc
