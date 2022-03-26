@@ -7,7 +7,6 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import { useState, useEffect, useRef } from 'react';
 
 const CharityList = ({ charities, handleUpdate, selectedCharity, searchTerm, handleSearch }) => {
-
     const inputElement = useRef("");
     const getSearchTerm = () => {
         handleSearch(inputElement.current.value);
