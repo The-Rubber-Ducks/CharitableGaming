@@ -1,25 +1,24 @@
 import {useState, useEffect} from 'react';
 import CharityList from './CharityList';
-import useFetch from './useFetch';
 const Charities = () => {
     const [ searchTerm, setSearchTerm ] = useState("");
     const [ searchResults, setSearchResults ] = useState([]);
 
     // fetch list of all charities
     // const { data: charities, isPending, error } = useFetch('http://localhost:8000/charities');
-    const [ charities, setCharities ] = useState(null);
-    const [ charitiesPending, setCharitiesPending ] = useState(true);
-    const [ charitiesError, setCharitiesError] = useState(null);
+    const [charities, setCharities] = useState(null);
+    const [charitiesPending, setCharitiesPending] = useState(true);
+    const [charitiesError, setCharitiesError] = useState(null);
 
     // user info
     const currentUserID = 1; // dummy data
-    const [ userID, setUserID ] = useState(null);
-    const [ username, setUsername ] = useState(null);
-    const [ profilePicture, setProfilePicture] = useState(null);
-    const [ createdAt, setCreatedAt ] = useState(null); 
-    const [ charityPoints, setCharityPoints ] = useState(null);
-    const [ userRegion, setUserRegion ] = useState(null);
-    const [ selectedCharity, setSelectedCharity ] = useState(null);
+    const [userID, setUserID] = useState(null);
+    const [username, setUsername] = useState(null);
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [createdAt, setCreatedAt] = useState(null); 
+    const [charityPoints, setCharityPoints] = useState(null);
+    const [userRegion, setUserRegion] = useState(null);
+    const [selectedCharity, setSelectedCharity] = useState(null);
 
     useEffect(() => {
         fetch(`http://localhost:8000/users/${currentUserID}`)
@@ -49,6 +48,7 @@ const Charities = () => {
         })
         .then(charities => {
             setCharities(charities);
+            setSearchResults(charities);
         })
     }, []);
 
@@ -84,13 +84,13 @@ const Charities = () => {
 
     return (  
         <div className="content">
-            <h2>Our Patrons</h2>
+            <h2>Charities List</h2>
             { charitiesError && <div className="">{ charitiesError }</div> }
             { charitiesPending && <div className="">Loading...</div> }
             { selectedCharity && charities && 
             <CharityList 
-                charities={ (searchResults.length < 1) ? charities : searchResults } 
-                title="Our Patrons" 
+                // charities={ (searchResults.length < 1) ? charities : searchResults } 
+                charities={ searchResults }
                 handleUpdate={ handleUpdate }  
                 selectedCharity={ selectedCharity } 
                 searchTerm={ searchTerm } 

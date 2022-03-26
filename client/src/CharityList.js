@@ -18,15 +18,16 @@ const CharityList = ({ charities, handleUpdate, selectedCharity, searchTerm, han
             <InputGroup>
             <Form.Control 
                 ref={ inputElement }
-                className="charity-filter m-3" 
+                className="charity-filter mx-3 mt-3" 
                 type="text" 
                 placeholder="Search Charities" 
                 value={ searchTerm } 
                 onChange={ getSearchTerm }
             />
             </InputGroup>
+            { (charities.length == 0) && <Row className="justify-content-center pt-2 pb-3">No results found.</Row>}
 
-
+            {/* Iterate through charities list and output to table */}
             {charities.map(charity => (
                 <Row className="charity-info" key = { charity.id }>
                     <Col xs={8} className="charity-primary-info"> 
