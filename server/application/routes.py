@@ -1,4 +1,5 @@
-from flask import render_template, url_for, redirect, jsonify
+from flask import url_for, redirect, jsonify
+from application import app, fbase
 
 
 @app.route("/api/login", methods=['POST'])
@@ -12,6 +13,7 @@ def login():
 
 
     return abort(405)
+
 
 @app.route("/api/register", methods=['POST'])
 def register():
@@ -28,3 +30,6 @@ def register():
 
 
     return abort(405)
+
+
+print(fbase.authenticate_user("mob@example.com", "password"))
