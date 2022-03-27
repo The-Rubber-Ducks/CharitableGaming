@@ -37,6 +37,7 @@ from functools import wraps
 import requests
 from dotenv import load_dotenv
 from os import environ, path
+import copy
 
 basedir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(basedir, ".env"))
@@ -237,6 +238,10 @@ class FirebaseFuncs:
 		token that is still available can be used for authentication still.
 
 		No method currently to invalidate the tokens provided by Google.
+		The token will just expire after the default of 3600 seconds from authorization.
+
+		Raises:
+			firebase_admin.exceptions.FirebaseError: If There is a FireBase error
 		"""
 		self._auth.revoke_refresh_tokens(self._current_user_uid)
 		self._current_user_uid = None
@@ -277,6 +282,74 @@ class FirebaseFuncs:
 			'charity': ''
 		})
 
+
+	def verify_user(self) -> bool:
+		"""Verifies the current user's ID token. True if verified, False if not."""
+		try:
+			self._auth.verify_id_token(self._current_user_idToken)
+
+		except (ValueError, InvalidIdTokenError, ExpiredIdTokenError, 
+				RevokedIdTokenError, CertificateFetchError, UserDisabledError):
+			return False
+
+		else:
+			return True
+
+
+	def get_all_charity_info(self) -> dict:
+		"""
+		Requests all the charity data from the database, and returns it as a dict.
+		
+		Returns:
+			(dict): A dict, where the key is charities, and the values are a list of dicts. Each
+						nested dict contains information on the charity, as follows:
+
+						"name" (str): Name of charity,
+						"description" (str): Description of charity,
+						"category" (str): Category of the charity,
+						"location" (str): Location of the charity,
+						"year" (str): Year charity was created,
+						"charity_id" (int): The charity id
+		"""
+		all_charities = self._db.collection_group('charity').order_by('charity_id').get()
+		charities = {"charities": []}
+
+		for charity in all_charities:
+			charities["charities"].append(charity.to_dict())
+
+		return charities
+
+	def get_leaderboard(self) -> dict:
+		"""
+		Requests the 3 highest players with the most charity points.
+
+		Returns:
+			list: List of dicts containing 3 highest players.
+		"""
+		all_leaders = self._db.collection_group('users').order_by('charity_points').get()
+		leaders = []
+		for leader in all_leaders:
+			leaders.append(leader.to_dict())
+
+		leaders.reverse()
+		
+		return leaders
+
+	@_is_current_user_set_or_expired
+	def get_logged_in_user_data(self) -> list:
+		"""
+		Returns the currently logged in user's data. User must be authenticated.
+
+		Returns:
+			(dict): Containing current user's data, with the following key value pairs:
+						'charity_points' (int): Charity points for the player,
+						'user_region' (str): The current user's region,
+						'created_at' (str): String format for time user was added,
+		"""
+		current_user_dict = self._current_user_object.to_dict()
+		current_user_dict['charity'] = current_user_dict['charity'].get().to_dict()['name']
+		
+		return current_user_dict
 
 	@_is_current_user_set_or_expired
 	def add_points_to_current_user(self, points_to_add: int) -> bool:
@@ -349,7 +422,7 @@ class FirebaseFuncs:
 
 
 	@_is_current_user_set_or_expired
-	def get_user_player_id(self, game_name: str="League of Legends") -> str:
+	def get_user_handle_and_region(self, game_name: str="League of Legends") -> tuple:
 		"""
 		Gets the user's player ID for the requested game. Access to the game API is available through the player's ID.
 		The player's ID differs from their username.
@@ -358,7 +431,7 @@ class FirebaseFuncs:
 			game_name (str, optional): The game's name. Defaults to "League of Legends".
 
 		Returns:
-			str: The user's player id.
+			tuple: Tuple of strings - (summoner_id, region)
 		"""
 		game = self._db.collection('games').where('name','==',f'{game_name}').get()
 
@@ -374,7 +447,10 @@ class FirebaseFuncs:
 			# No valid player ID available
 			raise db_exceptions.NotFoundError('No player ID found. One must be set.')
 
-		return player_id[0].to_dict()['playerID']
+		summoner_name = player_id[0].to_dict()['playerID']
+		region = self._current_user_object.to_dict()['user_region']
+
+		return summoner_name, region
 
 
 	@_is_current_user_set_or_expired	
@@ -382,8 +458,6 @@ class FirebaseFuncs:
 		"""
 		Checks if charity exists.
 		If so, then sets the current user's charity to the given charity.
-		For consistency, all charity names are set to lowercase, and all spaces are removed.
-
 		Args:
 			charity_name (str): The Charity to set to
 
@@ -394,8 +468,6 @@ class FirebaseFuncs:
 			bool: True if success
 		"""
 
-		# All charity names have no spaces and are set to lowercase
-		charity_name = charity_name.replace(' ','').lower()
 		try:
 			charity = self._db.collection('charity').where('name','==',f'{charity_name}').get()[0]
 			if charity.exists:
@@ -413,7 +485,6 @@ class FirebaseFuncs:
 	def add_charity(self, charity_name: str) -> bool:
 		"""
 		Adds a charity with the given name to the database, as long as it doesn't already exist.
-		For consistency, all charity names are set to lowercase, and all spaces are removed.
 
 		Args:
 			charity_name (str): Charity to add
@@ -424,16 +495,15 @@ class FirebaseFuncs:
 		Returns:
 			bool: True if success, False if already exists
 		"""
-		# All charity names have no spaces and are set to lowercase
-		new_charity_name = charity_name.replace(' ','').lower()
-		charity_with_same_name = self._db.collection('charity').where('name','==',f'{new_charity_name}').get()
+		# Make sure charity doesn't exist already
+		charity_with_same_name = self._db.collection('charity').where('name','==',f'{charity_name}').get()
 
 		if not charity_with_same_name:
 			# Charity does not exist
 			new_charity = self._db.collection('charity').document(f'{charity_name}')
 			
 			new_charity.set({
-				'name': new_charity_name
+				'name': charity_name
 			})
 
 			return True
@@ -488,9 +558,15 @@ class FirebaseFuncs:
 		charity_points = 0
 
 		for match in match_data:
+			# Do not add a match to the database if it's already in there
+			previous_match = self._db.collection('leaguestats').where('playerID','==', player_id_obj.reference).where('match_id','==',f'{match}').get()
+			
+			if previous_match:
+				continue
+
 			current_match = match_data[match]
-			new_match_id_for_db = self._db.collection('leaguestats').document()
-			batch.set(new_match_id_for_db, {
+			new_match_for_db = self._db.collection('leaguestats').document()
+			batch.set(new_match_for_db, {
 				'match_id': f'{match}',
 				'kills': current_match['kills'],
 				'assists': current_match['assists'],
