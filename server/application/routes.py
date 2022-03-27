@@ -1,10 +1,9 @@
 from flask import request, abort
-from application import app, fbase
+from application import app, fbase, RiotWatcher
 from .FirebaseFuncs.FirebaseFuncs import CurrentUserNotSet, UserAuthenticationError, UserTokenError
 from firebase_admin import auth, exceptions
 import json
 import requests
-import RiotWatcher
 
 
 @app.route("/api/login", methods=['POST'])
@@ -124,8 +123,16 @@ def get_user_league_games():
     # Send games to frontend
     if request.method == "GET":
         try:
+            fbase.authenticate_user("mob@example.com", "password")
             summoner_name = fbase.get_user_player_id()
-            
+            region = "North America"
+            puid = RiotWatcher.get_puuid(summoner_name, region)
+            return puid
+
+        except exceptions.FirebaseError:
+            return abort(400)
+        except UserTokenError:
+            return abort(400)
 
 
     return abort(405)
