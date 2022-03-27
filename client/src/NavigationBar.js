@@ -23,6 +23,7 @@ const NavigationBar = () => {
             <Nav className="me-auto">
                 <Nav.Link href="/dashboard">Dashboard</Nav.Link>
                 <Nav.Link href="/charities">Charities</Nav.Link>
+                <Nav.Link href="#logout">Logout</Nav.Link>
             </Nav>
             </Navbar.Collapse>
         </Container>
