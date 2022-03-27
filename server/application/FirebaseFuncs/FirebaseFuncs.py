@@ -319,36 +319,70 @@ class FirebaseFuncs:
 
 		return charities
 
-	def get_leaderboard(self) -> dict:
+	def get_leaderboard(self, game_name: str="League of Legends") -> dict:
 		"""
 		Requests the 3 highest players with the most charity points.
 
 		Returns:
 			list: List of dicts containing 3 highest players.
 		"""
+		game = self._db.collection('games').where('name','==',f'{game_name}').get()
+
+		if not game:
+			raise db_exceptions.NotFoundError('Game not found.')
+
+		# Since League of Legends is currently only game, there is only one item in the list
+		game = game[0]
+
 		all_leaders = self._db.collection_group('users').order_by('charity_points').get()
 		leaders = []
+		all_leaders.reverse()
 		for leader in all_leaders:
-			leaders.append(leader.to_dict())
+			summoner_name = self._db.collection('userplayernames').where('game','==', game.reference).where('user','==', leader.reference).get()
+			
+			if not summoner_name:
+				# Player doesn't play this game
+				continue
 
-		leaders.reverse()
+			else:
+				player_handle = summoner_name[0].to_dict()['playerID']
+				charity_points = leader.to_dict()['charity_points']
+				new_leader_dict = {player_handle: charity_points}
+				leaders.append(new_leader_dict)
 		
-		return leaders
+		return leaders[:3]
 
 	@_is_current_user_set_or_expired
-	def get_logged_in_user_data(self) -> list:
+	def get_logged_in_user_data(self, game_name: str="League of Legends") -> list:
 		"""
 		Returns the currently logged in user's data. User must be authenticated.
+
+		Args:
+			game_name: Current game name
 
 		Returns:
 			(dict): Containing current user's data, with the following key value pairs:
 						'charity_points' (int): Charity points for the player,
 						'user_region' (str): The current user's region,
 						'created_at' (str): String format for time user was added,
+						'gamer_handle' (str): Returns the gamer handle
 		"""
+		game = self._db.collection('games').where('name','==',f'{game_name}').get()
+
+		if not game:
+			raise db_exceptions.NotFoundError('Game not found.')
+
+		# Since League of Legends is currently only game, there is only one item in the list
+		game = game[0]
+
 		current_user_dict = self._current_user_object.to_dict()
-		current_user_dict['charity'] = current_user_dict['charity'].get().to_dict()['name']
-		
+		summoner_name = self._db.collection('userplayernames').where('game','==', game.reference).where('user','==', self._current_user_object.reference).get()
+		if current_user_dict['charity']:
+			# User charity  set
+			current_user_dict['charity'] = current_user_dict['charity'].get().to_dict()['name']
+
+		user_handle = summoner_name[0].to_dict()['playerID']
+		current_user_dict["gamer_handle"] = user_handle
 		return current_user_dict
 
 	@_is_current_user_set_or_expired
