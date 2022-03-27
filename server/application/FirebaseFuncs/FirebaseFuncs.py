@@ -336,7 +336,7 @@ class FirebaseFuncs:
 		return leaders
 
 	@_is_current_user_set_or_expired
-	def get_logged_in_user_data(self) -> dict:
+	def get_logged_in_user_data(self) -> list:
 		"""
 		Returns the currently logged in user's data. User must be authenticated.
 
