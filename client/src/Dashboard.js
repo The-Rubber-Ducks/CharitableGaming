@@ -18,6 +18,8 @@ const Dashboard = () => {
     return (  
         <div className="main-dashboard-container">
             <div className="dashboard-left-col">
+                <div className="charity-stats-overview">CHARITY STATS GO HERE</div>
+                <div className="leaderboard">LEADER BOARD GOES HERE </div>
             </div>
             <div className="dashboard-right-col">
                 <MatchList gameTitle={"League of Legends"} matches={matches}/>

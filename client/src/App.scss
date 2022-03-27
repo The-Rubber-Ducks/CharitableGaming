@@ -82,14 +82,32 @@ code {
     font-size: 0.9em;
     padding: 0.55em 0.35em;
   }
-
 }
 
 .main-dashboard-container {
   display: flex;
   height: 90vh;
   .dashboard-left-col {
+    display: flex;
     flex: 2;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    .charity-stats-overview,
+    .leaderboard {
+      border: .5px solid #d3d3d3;
+    }
+    .charity-stats-overview {
+      height: 150px;
+      width: 400px;
+    }
+
+    .leaderboard {
+      margin-top: 2em;
+      width: 350px;
+      height: 300px;
+    }
   }
   .dashboard-right-col {
     display: flex;
@@ -101,5 +119,4 @@ code {
       // float: right;
     }
   }
-
 }
