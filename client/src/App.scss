@@ -20,14 +20,26 @@ code {
   color: #ED4337;
 }
 
-// .centered {
-//   position: fixed;
-//   top: 50%;
-//   left: 50%;
-//   transform: translate(-50%, -50%);
-// }
+.register-container {
+  width: 600px;
+  border: .5px solid gray;
+  padding: 2em;
+  border-radius: .55em;
+}
 
-.charities-table {
+.centered {
+  position: fixed;
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.charities-page-title {
+  margin-top: 1em;
+  text-align: center;
+}
+
+.charities-page-table {
   max-height: 70vh;
   overflow: auto;
   border: 0.5px solid gray;
