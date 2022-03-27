@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
 /* This example requires Tailwind CSS v2.0+ */
 const navigation = [
-    { name: 'About us', href: '#' },
-    { name: 'Charities', href: '#' },
-    { name: 'Leaderboard', href: '#' }
+    { name: 'About', href: '/about' },
+    { name: 'Charities', href: '/charities' },
+    { name: 'Leaderboard', href: '/leaderboard' }
 ]
 
 export default function NavigationBar() {
@@ -22,32 +22,32 @@ export default function NavigationBar() {
                         </Link>
                         <div className="hidden ml-10 space-x-8 lg:block">
                             {navigation.map((link) => (
-                                <a key={link.name} href={link.href} className="text-base font-medium text-white hover:text-indigo-50">
+                                <Link key={link.name} to={link.href} className="text-base font-medium text-white hover:text-indigo-50">
                                     {link.name}
-                                </a>
+                                </Link>
                             ))}
                         </div>
                     </div>
                     <div className="ml-10 space-x-4">
-                        <a
-                            href="#"
+                        <Link
+                            to="/login"
                             className="inline-block bg-indigo-500 py-2 px-4 border border-transparent rounded-md text-base font-medium text-white hover:bg-opacity-75"
                         >
                             Login
-                        </a>
-                        <a
-                            href="#"
+                        </Link>
+                        <Link
+                            to="/register"
                             className="inline-block bg-white py-2 px-4 border border-transparent rounded-md text-base font-medium text-indigo-600 hover:bg-indigo-50"
                         >
                             Register
-                        </a>
+                        </Link>
                     </div>
                 </div>
                 <div className="py-4 flex flex-wrap justify-center space-x-6 lg:hidden">
                     {navigation.map((link) => (
-                        <a key={link.name} href={link.href} className="text-base font-medium text-white hover:text-indigo-50">
+                        <Link key={link.name} to={link.href} className="text-base font-medium text-white hover:text-indigo-50">
                             {link.name}
-                        </a>
+                        </Link>
                     ))}
                 </div>
             </nav>
