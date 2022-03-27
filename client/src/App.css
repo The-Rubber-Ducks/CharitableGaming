@@ -26,6 +26,10 @@
 	background-color: #e8b4b4;
 }
 
+.win-loss {
+	font-weight: bold;
+}
+
 /* .network-error-msg {
 	font-size: 1.2em;
 	text-align: center;

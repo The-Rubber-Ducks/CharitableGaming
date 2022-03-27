@@ -8,11 +8,14 @@ export default function MatchList({ matches }) {
 
     const imageSize = "30px";
     return (
-      <div className="bg-white shadow overflow-hidden rounded-md w-4/5">
+      <div className="bg-white shadow overflow-hidden rounded-md w-4/5 col">
         <ul role="list" className="divide-y divide-gray-200">
           {matches.map((match, i) => ( 
             <li key={i} className={(match.win ? "victory" : "defeat") + " px-6 py-4 flex h-24 stats"}>
-              <div className="stat-container w-1/4">
+            <div className="stat-container w-1/5 win-loss">
+                {match.win ? "VICTORY" : "DEFEAT"} 
+            </div>
+              <div className="stat-container w-1/5">
                   <img 
                     src="kill.png" 
                     width={imageSize}
@@ -22,7 +25,7 @@ export default function MatchList({ matches }) {
                   />
                   {match.kills} { (match.kills !== 1) ? "kills" : "kill"}
               </div>
-              <div className="stat-container w-1/4">
+              <div className="stat-container w-1/5">
                 <img 
                         src="death.png" 
                         width={imageSize}
@@ -32,7 +35,7 @@ export default function MatchList({ matches }) {
                     />
                   {match.deaths} deaths
                 </div>
-              <div className="stat-container w-1/4">
+              <div className="stat-container w-1/5">
                 <img 
                     src="assist.png" 
                     width={imageSize}
@@ -43,7 +46,7 @@ export default function MatchList({ matches }) {
                   {match.assists} assists
 
               </div>
-              <div className="stat-container w-1/4">+ {match.charityPoints} CP</div>
+              <div className="stat-container w-1/5">+ {match.charityPoints} CP</div>
             </li>
           ))}
         </ul>
