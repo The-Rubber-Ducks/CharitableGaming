@@ -181,9 +181,10 @@ def get_leaderboard():
         [{"topo": 692}, {"topo": 0}, {"topo": 0}]
     """
     if request.method == "GET":
-        game_name = request.args['game']
+        leader_response = request.get_json()
+        game_name = leader_response['game']
         game_name = game_name.replace('_', ' ')
-        num_choices = request.args['num_of_choices']
+        num_choices = leader_response['num_of_choices']
         leaderboard = fbase.get_leaderboard(num_choices, game_name)
         return json.dumps(leaderboard), 200, {'ContentType':'application/json'}
 
