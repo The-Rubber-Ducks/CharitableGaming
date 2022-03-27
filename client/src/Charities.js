@@ -15,7 +15,7 @@ const Charities = () => {
     const [userID, setUserID] = useState(null);
     const [username, setUsername] = useState(null);
     const [profilePicture, setProfilePicture] = useState(null);
-    const [createdAt, setCreatedAt] = useState(null); 
+    const [createdAt, setCreatedAt] = useState(null);
     const [charityPoints, setCharityPoints] = useState(null);
     const [userRegion, setUserRegion] = useState(null);
     const [selectedCharity, setSelectedCharity] = useState(null);
@@ -84,8 +84,10 @@ const Charities = () => {
 
     return (  
         <div className="content">
-            <h2>Charities List</h2>
-            { charitiesError && <div className="">{ charitiesError }</div> }
+            <div className="charities-page-title">
+                <h2>Charities List</h2>
+            </div>
+            { charitiesError && <div className="network-error-msg">{ charitiesError }</div> }
             { charitiesPending && <div className="">Loading...</div> }
             { selectedCharity && charities && 
             <CharityList 

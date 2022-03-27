@@ -4,7 +4,7 @@ import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
-import { useState, useEffect, useRef } from 'react';
+import { useRef } from 'react';
 
 const CharityList = ({ charities, handleUpdate, selectedCharity, searchTerm, handleSearch }) => {
     const inputElement = useRef("");
@@ -13,7 +13,7 @@ const CharityList = ({ charities, handleUpdate, selectedCharity, searchTerm, han
     };
 
     return (  
-        <Container className="charities-table centered">
+        <Container className="charities-page-table centered">
             <InputGroup>
             <Form.Control 
                 ref={ inputElement }
@@ -24,7 +24,7 @@ const CharityList = ({ charities, handleUpdate, selectedCharity, searchTerm, han
                 onChange={ getSearchTerm }
             />
             </InputGroup>
-            { (charities.length == 0) && <Row className="justify-content-center pt-2 pb-3">No results found.</Row>}
+            { (charities.length === 0) && <Row className="justify-content-center pt-2 pb-3">No results found.</Row>}
 
             {/* Iterate through charities list and output to table */}
             {charities.map(charity => (
