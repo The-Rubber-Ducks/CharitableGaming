@@ -1,3 +1,4 @@
+from ast import Index
 from flask import request, abort
 from application import app, fbase, RiotWatcher
 from .FirebaseFuncs.FirebaseFuncs import CurrentUserNotSet, UserAuthenticationError, UserTokenError
@@ -35,6 +36,7 @@ def register():
     """
     Registers a new user. Adds them to the database. Then requests an idToken from the
     Firebase authentication system. "Logs" them in by set their user data in the FirebaseFuncs object.
+    Sets their charity and player handles for specified games.
     """
     if request.method == "POST":
         register_response = request.get_json()
@@ -47,6 +49,7 @@ def register():
             password = register_response['password'] # password input field goes here
             confirmpassword = register_response['confirmpassword']
             gamerhandles = register_response['gamerhandles']
+            charity = register_response['charity']
 
             if not gamerhandles:
                 return abort(400)
@@ -65,7 +68,7 @@ def register():
                 game_name, gamerhandle = game.popitem()
                 fbase.set_user_player_id(gamerhandle, game_name)
 
-            # Still need to add playerID to database
+            fbase.set_user_charity(charity)
 
         except auth.EmailAlreadyExistsError: 
             return abort(400)
@@ -74,6 +77,8 @@ def register():
         except KeyError:
             return abort(400)
         except exceptions.NotFoundError:
+            return abort(400)
+        except IndexError:
             return abort(400)
         else:
             return  json.dumps({'success': True}), 200, {'ContentType':'application/json'}
@@ -172,7 +177,8 @@ def get_leaderboard():
     if request.method == "GET":
         game_name = request.args['game']
         game_name = game_name.replace('_', ' ')
-        leaderboard = fbase.get_leaderboard(game_name)
+        num_choices = request.args['num_of_choices']
+        leaderboard = fbase.get_leaderboard(game_name, num_choices)
         return json.dumps(leaderboard), 200, {'ContentType':'application/json'}
 
     return abort(405)
