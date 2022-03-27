@@ -28,7 +28,7 @@
       "charity": 1
     }
   ],
-  "matches": [
+  "get_user_league_games": [
     {
       "assists": 14,
       "deaths": 5,
