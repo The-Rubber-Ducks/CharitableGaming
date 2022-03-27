@@ -319,9 +319,13 @@ class FirebaseFuncs:
 
 		return charities
 
-	def get_leaderboard(self, game_name: str="League of Legends") -> dict:
+	def get_leaderboard(self, num_of_choices: str, game_name: str="League of Legends") -> dict:
 		"""
 		Requests the 3 highest players with the most charity points.
+
+		Args:
+			game_name (str): The game name for the leaderboard
+			num_of_choices (str): How many choices requested, either 'mini' or 'complete'
 
 		Returns:
 			list: List of dicts containing 3 highest players.
@@ -350,7 +354,10 @@ class FirebaseFuncs:
 				new_leader_dict = {player_handle: charity_points}
 				leaders.append(new_leader_dict)
 		
-		return leaders[:3]
+		if num_of_choices == 'mini':
+			return leaders[:3]
+		else:
+			return leaders
 
 	@_is_current_user_set_or_expired
 	def get_logged_in_user_data(self, game_name: str="League of Legends") -> list:

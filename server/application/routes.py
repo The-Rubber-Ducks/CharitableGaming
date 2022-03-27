@@ -178,7 +178,7 @@ def get_leaderboard():
         game_name = request.args['game']
         game_name = game_name.replace('_', ' ')
         num_choices = request.args['num_of_choices']
-        leaderboard = fbase.get_leaderboard(game_name, num_choices)
+        leaderboard = fbase.get_leaderboard(num_choices, game_name)
         return json.dumps(leaderboard), 200, {'ContentType':'application/json'}
 
     return abort(405)
