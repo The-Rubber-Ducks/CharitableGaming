@@ -5,3 +5,5 @@ tester.py
 **/.env
 **/__pycache__
 **/.pyc
+**/env
+**/env3.9

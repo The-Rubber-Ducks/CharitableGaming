@@ -7,7 +7,7 @@
       "created_at": "01-01-2020",
       "charity_points": 10000,
       "user_region": "North America",
-      "charity": 1
+      "charity": 2
     },
     {
       "id": 2,
@@ -26,6 +26,38 @@
       "charity_points": 10000,
       "user_region": "North America",
       "charity": 1
+    }
+  ],
+  "get_user_league_games": [
+    {
+      "assists": 14,
+      "deaths": 5,
+      "kills": 4,
+      "win": true
+    },
+    {
+      "assists": 9,
+      "deaths": 5,
+      "kills": 1,
+      "win": false
+    },
+    {
+      "assists": 1,
+      "deaths": 6,
+      "kills": 2,
+      "win": false
+    },
+    {
+      "assists": 4,
+      "deaths": 2,
+      "kills": 1,
+      "win": true
+    },
+    {
+      "assists": 8,
+      "deaths": 2,
+      "kills": 1,
+      "win": true
     }
   ],
   "charities": [
