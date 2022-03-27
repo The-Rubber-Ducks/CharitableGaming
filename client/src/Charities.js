@@ -86,6 +86,8 @@ const Charities = () => {
         <div className="content">
             <h2>Charities List</h2>
             { charitiesError && <div className="">{ charitiesError }</div> }
+            </div>
+            { charitiesError && <div className="network-error-msg">{ charitiesError }</div> }
             { charitiesPending && <div className="">Loading...</div> }
             { selectedCharity && charities && 
             <CharityList 

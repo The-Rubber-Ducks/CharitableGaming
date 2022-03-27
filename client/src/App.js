@@ -3,7 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.scss';
 import Dashboard from './Dashboard'
 import Charities from './Charities';
-// import { BrowserRouter, Routes, Route} from 'react-router-dom';
+import Register from './Register';
+import NavigationBar from './NavigationBar';
 
 function App() {  
   return (
