@@ -2,8 +2,9 @@ import { Link } from "react-router-dom";
 /* This example requires Tailwind CSS v2.0+ */
 const navigation = [
     { name: 'About', href: '/about' },
+    { name: 'Dashboard', href: '/dashboard' },
     { name: 'Charities', href: '/charities' },
-    { name: 'Leaderboard', href: '/leaderboard' }
+    { name: 'Leaderboard', href: '/leaderboard' },
 ]
 
 export default function NavigationBar() {
