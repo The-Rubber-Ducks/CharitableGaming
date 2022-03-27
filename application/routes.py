@@ -152,9 +152,7 @@ def get_user_league_games():
     """
     if request.method == "GET":
         try:
-            fbase.authenticate_user("mob@example.com", "password")
             summoner_name, region = fbase.get_user_handle_and_region()
-            #region = "North America"
             puid = RiotWatcher.get_puuid(summoner_name, region)
             last_five_matches = RiotWatcher.get_matchlist(puid, "North America", 5)
             stats = RiotWatcher.get_player_match_stats(puid, "North America", last_five_matches, "kills", "deaths", "assists", "win")
