@@ -8,7 +8,7 @@ const NavigationBar = () => {
     return (  
         <Navbar bg="light" expand="lg">
         <Container>
-            <Navbar.Brand href="/home">
+            <Navbar.Brand href="/dashboard">
             {/* <img
                 src={'/gameboy.png'}
                 alt="Logo"
@@ -21,7 +21,7 @@ const NavigationBar = () => {
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
-                <Nav.Link href="/home">Home</Nav.Link>
+                <Nav.Link href="/dashboard">Dashboard</Nav.Link>
                 <Nav.Link href="/charities">Charities</Nav.Link>
             </Nav>
             </Navbar.Collapse>
