@@ -3,11 +3,14 @@ from application import app, fbase, RiotWatcher
 from .FirebaseFuncs.FirebaseFuncs import CurrentUserNotSet, UserAuthenticationError, UserTokenError
 from firebase_admin import auth, exceptions
 import json
-import requests
 
 
 @app.route("/api/login", methods=['POST'])
 def login():
+    """
+    Logs in a user by requesting an idToken from Firebase authentication system.
+    Sets the user's data in the FirebaseFuncs object.
+    """
     if request.method == "POST":
         login_response = request.get_json()
 
@@ -29,6 +32,10 @@ def login():
 
 @app.route("/api/register", methods=['POST'])
 def register():
+    """
+    Registers a new user. Adds them to the database. Then requests an idToken from the
+    Firebase authentication system. "Logs" them in by set their user data in the FirebaseFuncs object.
+    """
     if request.method == "POST":
         register_response = request.get_json()
         # Return array of games and player handles
@@ -76,14 +83,21 @@ def register():
 
 @app.route("/api/get_all_charities")
 def get_all_charities():
+    """
+    Provides all the charity's data.
+    """
     if request.method == "GET":
+        charity_info = fbase.get_all_charity_info()
         # Call database functions to get charities
-        return  json.dumps({'success': True}), 200, {'ContentType':'application/json'}
+        return  json.dumps(charity_info['charities']), 200, {'ContentType':'application/json'}
     return abort(405)
 
 
 @app.route("/api/set_charity", methods=["POST"])
 def set_charity():
+    """
+    Sets a user's charity via the charity name.
+    """
     if request.method == "POST":
         set_charity_response = request.get_json()
         try: 
@@ -104,11 +118,15 @@ def set_charity():
 
 @app.route("/api/logout")
 def logout():
+    """
+    Logs out a user by revoking their refresh tokens, and dumping their data 
+    in the FirebaseFuncs object.
+    """
     if request.method == "GET":
         try:
             fbase.logout_user()
             return  json.dumps({'success': True}), 200, {'ContentType':'application/json'}
-        except firebase_admin.exceptions.FirebaseError:
+        except exceptions.FirebaseError:
             return abort(400)
 
     return abort(405)
@@ -116,31 +134,67 @@ def logout():
 
 @app.route("/api/get_user_league_games")
 def get_user_league_games():
-    # Get the player's GameID
-    # Call Will's Riot API to get the games
-    # Add a check for game in database
-    # Add games to database
-    # Send games to frontend
+    """
+    Returns the user's most recent 5 League of Legends games.
+    Requires pulling the summoner name they gave on registration.
+    """
     if request.method == "GET":
         try:
             fbase.authenticate_user("mob@example.com", "password")
-            summoner_name = fbase.get_user_player_id()
-            region = "North America"
+            summoner_name, region = fbase.get_user_handle_and_region()
+            #region = "North America"
             puid = RiotWatcher.get_puuid(summoner_name, region)
-            return puid
+            last_five_matches = RiotWatcher.get_matchlist(puid, "North America", 5)
+            stats = RiotWatcher.get_player_match_stats(puid, "North America", last_five_matches, "kills", "deaths", "assists", "win")
+            fbase.add_league_matches(summoner_name, stats)
+            return json.dumps(stats), 200, {'ContentType':'application/json'}
 
         except exceptions.FirebaseError:
             return abort(400)
         except UserTokenError:
             return abort(400)
 
+    return abort(405)
+
+
+@app.route("/api/get_leaderboard")
+def get_leaderboard():
+    """
+    Returns the top 3 players with the most charity points.
+    URL Example: http://localhost:8080/api/get_leaderboard?game=League_of_Legends
+
+    Args:
+        Requires a gamename.
+
+    Returns a JSON, as an example:
+        [{"topo": 692}, {"topo": 0}, {"topo": 0}]
+    """
+    if request.method == "GET":
+        game_name = request.args['game']
+        game_name = game_name.replace('_', ' ')
+        leaderboard = fbase.get_leaderboard(game_name)
+        return json.dumps(leaderboard), 200, {'ContentType':'application/json'}
 
     return abort(405)
 
-#@app.route("/api/get_user_league_games")
-#def get_league_games():
-#    if request.method == "GET":
-#
-#
-#@app.route("/api/charities")
-#def charities():
+
+@app.route("/api/get_user_data")
+def get_user_data():
+    """
+    Gets the currently logged in user's data.
+    
+    Returns JSON as example:
+        {
+            "user_region": "North America", 
+            "created_at": "03/27/2022 14:02:52", 
+            "charity_points": 0, 
+            "charity": "",  # Charity needs to be set on registration
+            "gamer_handle": "topo"}
+    """
+    if request.method == "GET":
+        user_data = fbase.get_logged_in_user_data()
+        return json.dumps(user_data), 200, {'ContentType':'application/json'}
+
+    # Need to catch if user doesn't have a charity gracefully... for now this is it
+
+    return abort(405)
