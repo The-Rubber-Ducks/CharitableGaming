@@ -1,0 +1,113 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "username": "test_user1",
+      "profile_picture": "/some/path/to/a/file",
+      "created_at": "01-01-2020",
+      "charity_points": 10000,
+      "user_region": "North America",
+      "charity": 3
+    },
+    {
+      "id": 2,
+      "username": "test_user2",
+      "profile_picture": "/some/path/to/a/file",
+      "created_at": "01-01-2020",
+      "charity_points": 10000,
+      "user_region": "North America",
+      "charity": 1
+    },
+    {
+      "id": 3,
+      "username": "test_user3",
+      "profile_picture": "/some/path/to/a/file",
+      "created_at": "01-01-2020",
+      "charity_points": 10000,
+      "user_region": "North America",
+      "charity": 1
+    }
+  ],
+  "matches": [
+    {
+      "assists": 14,
+      "deaths": 5,
+      "kills": 4,
+      "win": true
+    },
+    {
+      "assists": 9,
+      "deaths": 5,
+      "kills": 1,
+      "win": false
+    },
+    {
+      "assists": 1,
+      "deaths": 6,
+      "kills": 2,
+      "win": false
+    },
+    {
+      "assists": 4,
+      "deaths": 2,
+      "kills": 1,
+      "win": true
+    },
+    {
+      "assists": 8,
+      "deaths": 2,
+      "kills": 1,
+      "win": true
+    }
+  ],
+  "charities": [
+    {
+      "name": "Pencils of Promise",
+      "description": "Pencils of Promise (\"PoP\") is a 501(c)(3) nonprofit organization that believes every child deserves access to quality education. We create schools, programs and global communities around the common goal of education for all.",
+      "category": "Education & Youth",
+      "location": "Philadelphia, PA",
+      "year": "2008",
+      "id": 1
+    },
+    {
+      "name": "Operation Smile",
+      "description": "Vision We envision a future where health and dignity are improved through safe surgery. Mission Through our expertise in treating cleft lip and cleft palate, we create solutions that deliver safe surgery to people where it's needed most.",
+      "category": "International",
+      "location": "Virginia Beach, VA",
+      "year": "1982",
+      "id": 2
+    },
+    {
+      "name": "Rancho Obi-Wan Inc",
+      "description": "Our Purpose Is To Serve The World Through The Collection, Conservation, Exhibition, And Interpretation Of Star Wars Memorabilia And Artifacts, Using The Collection To Provide Meaningful Educational, Aesthetic, Intellectual, And Cultural Experiences For A Wide Array Of Audiences And To Carry Out Other Charitable And Educational Activities Associated With This Goal. ",
+      "category": "Education & Youth",
+      "location": "Petaluma, CA",
+      "year": "2015",
+      "id": 3
+    },
+    {
+      "name": "Food For The Poor",
+      "description": "Food For The Poor (FFP), one of the largest international relief and development organizations in the nation, does much more than feed millions of the hungry poor in 17 countries of the Caribbean and Latin America. This interdenominational Christian ministry provides emergency relief assistance, clean water, medicines, educational materials, homes, support for orphaned and abandoned children, care for the aged, skills training and micro-enterprise development assistance. Food For The Poor's… ",
+      "category": "International",
+      "location": "Coconut Creek, FL",
+      "year": "1982",
+      "id": 4
+    },
+    {
+      "name": "Mary's Place Seattle",
+      "description": "Mary's Place provides safe, inclusive shelter and services that support women, children and families on their journey out of homelessness.",
+      "category": "Human Services",
+      "location": "Seattle, WA",
+      "year": "2002",
+      "id": 5
+    },
+    {
+      "name": "Marine Toys For Tots Foundation",
+      "description": "The mission of the U. S. Marine Corps Reserve Toys for Tots Program is to collect new, unwrapped toys during October, November and December each year, and distribute those toys as Christmas gifts to less fortunate children in the community in which the campaign is conducted.",
+      "category": "Human Services",
+      "location": "Triange, VA",
+      "year": "2005",
+      "id": 6
+    }
+  ]
+}
