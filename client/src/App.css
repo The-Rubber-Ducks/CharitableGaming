@@ -1,4 +1,4 @@
-.network-error-msg {
+/* .network-error-msg {
 	font-size: 1.2em;
 	text-align: center;
 	color: #ed4337;
@@ -104,5 +104,5 @@
 }
 .dashboard-right-col .match-list-container {
 	width: 600px;
-	/* float: right; */
-}
+	float: right;
+} */
