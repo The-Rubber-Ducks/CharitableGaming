@@ -19,8 +19,8 @@ const Dashboard = () => {
     return (  
         <div className="container flex w-screen m-auto">
             <div className="container flex-col w-2/5" >
-                <div className="charity-stats-overview">CHARITY STATS GO HERE</div>
-                <div className="leaderboard">LEADER BOARD GOES HERE </div>
+                <div className="charity-stats-overview w-1/2">CHARITY STATS GO HERE</div>
+                <div className="leaderboard w-1/2">LEADER BOARD GOES HERE </div>
             </div>
             <div className="container w-3/5 flex justify-center items-center mt-10">
                 {/* <MatchList gameTitle={"League of Legends"} matches={matches}/> */}

@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom'
+import { useState } from 'react';
+
 /*
   This example requires Tailwind CSS v2.0+ 
   
@@ -16,16 +18,22 @@ import { Link } from 'react-router-dom'
   ```
 */
 export default function Login() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const handleSubmit = () => {
+    const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+    };
+    fetch("http://localhost:8000/api/login", requestOptions)
+        .then(res => console.log('Submitted successfully'))
+        .catch(err => console.log(err.message))
+};
+
   return (
     <>
-      {/*
-        This example requires updating your template:
-
-        ```
-        <html class="h-full bg-gray-50">
-        <body class="h-full">
-        ```
-      */}
       <div className="min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <img
@@ -101,6 +109,7 @@ export default function Login() {
                 <button
                   type="submit"
                   className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  onClick={ handleSubmit }
                 >
                   Sign in
                 </button>

@@ -4,9 +4,11 @@ from application import app, fbase, RiotWatcher
 from .FirebaseFuncs.FirebaseFuncs import CurrentUserNotSet, UserAuthenticationError, UserTokenError
 from firebase_admin import auth, exceptions
 import json
+from flask_cors import CORS, cross_origin
 
 
 @app.route("/api/login", methods=['POST'])
+@cross_origin()
 def login():
     """
     Logs in a user by requesting an idToken from Firebase authentication system.
@@ -32,6 +34,7 @@ def login():
 
 
 @app.route("/api/register", methods=['POST'])
+@cross_origin()
 def register():
     """
     Registers a new user. Adds them to the database. Then requests an idToken from the
@@ -47,7 +50,6 @@ def register():
         try:
             email = register_response['email'] # email input field goes here
             password = register_response['password'] # password input field goes here
-            confirmpassword = register_response['confirmpassword']
             gamerhandles = register_response['gamerhandles']
             charity = register_response['charity']
 
@@ -58,9 +60,6 @@ def register():
                 for val in game.values():
                     if not val:
                         return abort(400)
-
-            if password != confirmpassword:
-                return abort(400)
             fbase.add_new_user_email_and_password(email, password)
             authenticate = fbase.authenticate_user(email, password)
 
@@ -83,10 +82,11 @@ def register():
         else:
             return  json.dumps({'success': True}), 200, {'ContentType':'application/json'}
 
-    return abort(405)
+    return abort(400)
 
 
 @app.route("/api/get_all_charities")
+@cross_origin()
 def get_all_charities():
     """
     Provides all the charity's data.

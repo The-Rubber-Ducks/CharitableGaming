@@ -11,38 +11,35 @@ const Charities = () => {
     const [charitiesError, setCharitiesError] = useState(null);
 
     // user info
-    const currentUserID = 1; // dummy data
-    const [userID, setUserID] = useState(null);
     const [username, setUsername] = useState(null);
-    const [profilePicture, setProfilePicture] = useState(null);
     const [createdAt, setCreatedAt] = useState(null);
     const [charityPoints, setCharityPoints] = useState(null);
     const [userRegion, setUserRegion] = useState(null);
     const [selectedCharity, setSelectedCharity] = useState(null);
 
     useEffect(() => {
-        fetch(`http://localhost:8000/users/${currentUserID}`)
+        fetch(`http://localhost:8000/api/get_user_data}`)
             .then(res => {
-                if (!res.ok) throw("Error fetching data for charities");
+                if (!res.ok) throw("Error fetching data for user");
                 return res.json();
             })
             .then(user => {
-                setUserID(user.id);
-                setUsername(user.username);
-                setProfilePicture(user.profile_picture);
+                setUsername(user.gamer_handle);
                 setCreatedAt(user.created_at);
                 setCharityPoints(user.charity_points);
                 setUserRegion(user.user_region);
                 setSelectedCharity(user.charity);
+
                 setCharitiesPending(false);
                 setCharitiesError(null);
             })
             .catch(err => {
+                console.log("can't get user data")
                 setCharitiesError(err.message);
                 setCharitiesPending(false);
             })
 
-        fetch('http://localhost:8000/charities')
+        fetch("http://localhost:8000/api/get_all_charities")
         .then(res => {
             return res.json();
         })
@@ -54,13 +51,11 @@ const Charities = () => {
 
     const handleUpdate = (id) => {
         setSelectedCharity(id);
-        fetch(`http://localhost:8000/users/${currentUserID}`, {
-            method: 'PUT',
+        fetch("http://localhost:8000/api/set_charity", {
+            method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                "id": userID,
                 "username": username,
-                "profile_picture": profilePicture,
                 "created_at": createdAt,
                 "charity_points": charityPoints,
                 "user_region": userRegion,

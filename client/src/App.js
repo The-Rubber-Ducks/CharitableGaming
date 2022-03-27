@@ -9,6 +9,7 @@ import ResetPassword from './ResetPassword'
 import NotFound from './NotFound';
 import NavigationBar from './NavigationBar';
 import Footer from './Footer';
+import './App.scss';
 
 function App() {
   return (
