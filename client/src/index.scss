@@ -1,8 +1,11 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+// @tailwind base;
+// @tailwind components;
+// @tailwind utilities;
 
-/* @import '~bootstrap/scss/bootstrap'; */
+// @import "../node_modules/bootstrap/scss/functions";
+// @import "../node_modules/bootstrap/scss/_variables";
+// @import "../node_modules/bootstrap/scss/_mixins";
+// @import "~bootstrap/scss/_dropdown.scss";
 
 @supports (font-variation-settings: normal) {
 	html {

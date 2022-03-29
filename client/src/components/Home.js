@@ -1,32 +1,5 @@
-/*
-  This example requires Tailwind CSS v2.0+ 
-  
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  const colors = require('tailwindcss/colors')
-  
-  module.exports = {
-    // ...
-    theme: {
-      extend: {
-        colors: {
-          indigo: colors.indigo,
-        },
-      },
-    },
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ],
-  }
-  ```
-*/
 import { ChevronRightIcon, StarIcon } from '@heroicons/react/solid'
-import PiggyBank from './assets/piggy-bank.png'
-// import ActionFigure from './assets/action-figure.jpg'
-import Astronaut from './assets/astronaut.mp4'
+import PiggyBank from '../assets/piggy-bank.png'
 
 const stats = [
   { label: 'Founded', value: '2021' },
