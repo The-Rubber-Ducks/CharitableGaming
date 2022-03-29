@@ -5,6 +5,7 @@ import CharityList from './CharityList';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import { useNavigate } from 'react-router-dom';
 
 
 
@@ -17,6 +18,8 @@ export default function Register() {
     const [charity, setCharity] = useState('');
     const [dropdownText, setDropdownText] = useState('Select a charity');
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         fetch("https://charitable-gaming-server.herokuapp.com/api/get_all_charities")
         .then(res => {
@@ -24,6 +27,7 @@ export default function Register() {
         })
         .then(charityList => {
             setCharityList(charityList);
+            navigate('/dashboard');
         })
     }, []);
 
