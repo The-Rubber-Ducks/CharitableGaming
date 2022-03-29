@@ -7,6 +7,10 @@
 	width: 500px;
 }
 
+.match-list-container {
+	width: 100%;
+}
+
 .stats {
   border: 1.5px solid #d3d3d3;
   margin-bottom: 0.2em;
@@ -144,6 +148,6 @@
 	align-items: center;
 }
 .dashboard-right-col .match-list-container {
-	width: 600px;
+	width: 700px;
 	float: right;
 }

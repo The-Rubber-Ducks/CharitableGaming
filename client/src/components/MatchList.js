@@ -14,43 +14,46 @@ const MatchList = ({ matches }) => {
 
     const imageSize = "30px";
     return (
-      <ListGroup>
+      <ListGroup className="match-list-container">
           {matches.map((match, i) => ( 
             <ListGroup.Item key={i} className={match.win ? "victory" : "defeat"}>
-            <Col className="stat-container win-loss">
-                {match.win ? "VICTORY" : "DEFEAT"} 
-            </Col>
-              <Col className="stat-container">
-                  <img 
-                    src="kill.png" 
-                    width={imageSize}
-                    height={imageSize}
-                    alt="Logo" 
-                    className="stat-logo"
-                />
-                  {match.kills} { (match.kills !== 1) ? "kills" : "kill"}
-              </Col>
-              <Col className="stat-container">
-                <img 
-                        src="death.png" 
-                        width={imageSize}
-                        height={imageSize}
-                        alt="Logo" 
-                        className="stat-logo"
-                />
-                  {match.deaths} deaths
-                </Col>
-              <Col className="stat-container">
-                <img 
-                    src="assist.png" 
-                    width={imageSize}
-                    height={imageSize}
-                    alt="Logo" 
-                    className="stat-logo"
-                />
-                  {match.assists} assists
-              </Col>
-              <Col className="stat-container">+ {match.charityPoints} CP</Col>
+                <Row>
+                    <Col className="stat-container win-loss">
+                        {match.win ? "VICTORY" : "DEFEAT"} 
+                    </Col>
+                    <Col className="stat-container">
+                        <img 
+                            src="kill.png" 
+                            width={imageSize}
+                            height={imageSize}
+                            alt="Logo" 
+                            className="stat-logo"
+                        />
+                        {match.kills} { (match.kills !== 1) ? "kills" : "kill"}
+                    </Col>
+                    <Col className="stat-container">
+                        <img 
+                                src="death.png" 
+                                width={imageSize}
+                                height={imageSize}
+                                alt="Logo" 
+                                className="stat-logo"
+                        />
+                        {match.deaths} { (match.deaths !== 1) ? "deaths" : "death"}
+                        </Col>
+                    <Col className="stat-container">
+                        <img 
+                            src="assist.png" 
+                            width={imageSize}
+                            height={imageSize}
+                            alt="Logo" 
+                            className="stat-logo"
+                        />
+                        {match.assists} { (match.assists !== 1) ? "assists" : "assist"}
+                    </Col>
+                    <Col className="stat-container">+ {match.charityPoints} CP</Col>
+                </Row>
+
             </ListGroup.Item>
           ))}
       </ListGroup>
