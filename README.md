@@ -33,7 +33,8 @@ Example JSON input:
     "password": "password",
     "confirmpassword": "password",
     "gamerhandles": [{"League of Legends": "My Gamer Handle"}],
-    "charity": "My Charity"
+    "charity": "My Charity",
+    "display_name": "My Display Name"
 }
 ```
 
@@ -137,6 +138,7 @@ Example JSON output:
     "charity": "Mary's Place Seattle", 
     "created_at": "03/27/2022 20:01:47",
     "charity_points": 0, 
-    "gamer_handle": "My Handle"
+    "gamer_handle": "My Handle",
+    "display_name": "Goku"
 }
 ```
