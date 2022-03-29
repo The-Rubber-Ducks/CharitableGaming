@@ -126,6 +126,29 @@ def set_charity():
     return abort(405) 
 
 
+@app.route("/api/is_user_logged_in")
+@cross_origin()
+def is_user_logged_in():
+    """
+    Verifies if the user is logged in or not by verifying if there is a current user available in
+    the Firebase Funcs methods.
+
+    Returns JSON, Example:
+        {"logged_in":False}
+    """
+    if request.method == "GET":
+        logged_in = fbase.verify_user()
+        
+        if logged_in:
+            return  json.dumps({'logged_in': True}), 200, {'ContentType':'application/json'}
+
+        else:
+            return  json.dumps({'logged_in': False}), 200, {'ContentType':'application/json'}
+
+
+    return abort(405)
+
+
 @app.route("/api/logout")
 @cross_origin()
 def logout():
