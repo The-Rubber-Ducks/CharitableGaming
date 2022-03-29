@@ -152,7 +152,7 @@ class FirebaseFuncs:
 		self._current_user_object = self._db.collection('users').document(f'{user_id}').get()
 
 
-	def add_new_user_email_and_password(self, email: str, password: str) -> bool:
+	def add_new_user_email_and_password(self, email: str, password: str, display_name: str) -> bool:
 		"""
 		Adds a user for authentication using their email and password.
 		Once the user is authenticated, a User ID (uid) is given that is unique to that user.
@@ -161,6 +161,7 @@ class FirebaseFuncs:
 		Args:
 			email (str): User's email to add to the authentication
 			password (str): User's raw string password to add to Firebase authentication
+			display_name (str): User's display name to show on the page
 
 		Raises:
 			firebase_admin.auth.EmailAlreadyExistsError: If the given email already exists
@@ -174,7 +175,7 @@ class FirebaseFuncs:
 			email_verified=False
 		)
 		user_id = new_user_record.uid
-		self._add_user_to_firestore(user_id)
+		self._add_user_to_firestore(user_id, display_name)
 
 		return True
 
@@ -251,7 +252,7 @@ class FirebaseFuncs:
 		self._current_user_idToken = None
 
 
-	def _add_user_to_firestore(self, user_id: str):
+	def _add_user_to_firestore(self, user_id: str, display_name: str):
 		"""
 		Adds a user document to firestore based on the unique authentication id.
 
@@ -261,6 +262,7 @@ class FirebaseFuncs:
 
 		Args:
 			user_id (str): Given user's user id from authentication.
+			display_name (str): User's display name
 
 		Raises:
 			firebase_admin.exceptions.AlreadyExistsError: User document already exists.
@@ -279,7 +281,8 @@ class FirebaseFuncs:
 			'user_region': 'North America',
 			'charity_points': 0,
 			'created_at': current_time.strftime("%m/%d/%Y %H:%M:%S"),
-			'charity': ''
+			'charity': '',
+			'display_name': display_name
 		})
 
 
@@ -372,6 +375,7 @@ class FirebaseFuncs:
 						'charity_points' (int): Charity points for the player,
 						'user_region' (str): The current user's region,
 						'created_at' (str): String format for time user was added,
+						'display_name' (str): String format for user's display name
 						'gamer_handle' (str): Returns the gamer handle
 		"""
 		game = self._db.collection('games').where('name','==',f'{game_name}').get()

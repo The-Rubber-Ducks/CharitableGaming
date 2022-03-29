@@ -53,6 +53,7 @@ def register():
             confirmpassword = register_response['confirmpassword']
             gamerhandles = register_response['gamerhandles']
             charity = register_response['charity']
+            display_name = register_response['display_name']
 
             if not gamerhandles:
                 return abort(400)
@@ -64,7 +65,7 @@ def register():
 
             if password != confirmpassword:
                 return abort(400)
-            fbase.add_new_user_email_and_password(email, password)
+            fbase.add_new_user_email_and_password(email, password, display_name)
             authenticate = fbase.authenticate_user(email, password)
 
             for game in gamerhandles:
