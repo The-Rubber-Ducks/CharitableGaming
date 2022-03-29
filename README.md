@@ -80,6 +80,18 @@ Example JSON input:
     "charity_name": "My New Charity"
 }
 ```
+---
+
+### api/is_user_logged_in
+Method = GET.
+Returns a JSON containing a boolean value indicating whether the user is logged in or not.
+
+Example JSON output:
+```
+{
+    "logged_in": true
+}
+```
 
 ---
 ### api/logout
