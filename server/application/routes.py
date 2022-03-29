@@ -22,7 +22,7 @@ def login():
             # Need to make these forms
             email = login_response['email']
             password = login_response['password']
-            authenticate = fbase.authenticate_user(email, password)
+            authenticate = fbase.authenticate_user(email, password) 
         except UserAuthenticationError:
             return abort(400)
         except KeyError:

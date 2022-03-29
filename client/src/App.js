@@ -1,13 +1,13 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
-import Home from './Home'
-import Dashboard from './Dashboard'
-import Charities from './Charities';
-import Login from './Login';
-import Register from './Register';
-import ResetPassword from './ResetPassword'
-import NotFound from './NotFound';
-import NavigationBar from './NavigationBar';
-import Footer from './Footer';
+import Home from './components/Home'
+import Dashboard from './components/Dashboard'
+import Charities from './components/Charities';
+import Login from './components/Login';
+import Register from './components/Register';
+import ResetPassword from './components/ResetPassword'
+import NotFound from './components/NotFound';
+import NavigationBar from './components/NavigationBar';
+import Footer from './components/Footer';
 import './App.scss';
 
 function App() {
