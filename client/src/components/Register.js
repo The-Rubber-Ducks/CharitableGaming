@@ -4,6 +4,7 @@ import Dropdown from 'react-bootstrap/Dropdown';
 import CharityList from './CharityList';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 
 
@@ -12,9 +13,9 @@ export default function Register() {
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [gamerhandles, setGamerHandles] = useState([]);
-    const [charityList, setcharityList] = useState([]);
+    const [charityList, setCharityList] = useState([]);
     const [charity, setCharity] = useState('');
-    const [dropdownText, setDropdownText] = useState('Select a game');
+    const [dropdownText, setDropdownText] = useState('Select a charity');
 
     useEffect(() => {
         fetch("https://charitable-gaming-server.herokuapp.com/api/get_all_charities")
@@ -22,7 +23,7 @@ export default function Register() {
             return res.json();
         })
         .then(charityList => {
-            setcharityList(charityList);
+            setCharityList(charityList);
         })
     }, []);
 
@@ -41,53 +42,54 @@ export default function Register() {
         <Form className="centered login-form-container">
             <Form.Group className="mb-3">
                 <Form.Label>Email Address</Form.Label>
-                <Form.Control 
-                    type="email" 
+                <Form.Control
+                    type="email"
                     placeholder="Enter email"
-                    onChange={(e) => { setEmail(e.target.value) }} 
-                />
+                    onChange={(e) => { setEmail(e.target.value); } } />
             </Form.Group>
 
             <Form.Group className="mb-3">
                 <Form.Label>Password</Form.Label>
-                <Form.Control 
-                    type="password" 
-                    placeholder="Enter email" 
-                    onChange={(e) => { setPassword(e.target.value) }}
-                />
+                <Form.Control
+                    type="password"
+                    placeholder="Enter email"
+                    onChange={(e) => { setPassword(e.target.value); } } />
             </Form.Group>
 
             <Form.Group className="mb-3">
                 <Form.Label>Confirm Password</Form.Label>
-                <Form.Control 
+                <Form.Control
                     type="password"
-                    placeholder="Enter email" 
-                    onChange={(e) => { setConfirmPassword(e.target.value) }}
-                />
+                    placeholder="Confirm Password"
+                    onChange={(e) => { setConfirmPassword(e.target.value); } } />
             </Form.Group>
 
             <Dropdown className="mb-3">
                 <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-                    Select a game
+                    { dropdownText }
                 </Dropdown.Toggle>
 
                 <Dropdown.Menu>
-                    {charityList.map((charity) => (
-                        <Dropdown.Item onChange={(e) => setCharity(e.target.value)}>
-                            { charity }
+                    {charityList.map((charity, i) => (
+                        <Dropdown.Item key={i} onClick = {(e) => {
+                            setDropdownText( charity.name );
+                            setCharity( charity.name );
+                        }
+                        }>
+                        { charity.name }
                         </Dropdown.Item>
                     ))}
                 </Dropdown.Menu>
             </Dropdown>
 
-            <Button 
-                variant="primary" 
-                onClick={ handleSubmit }
+
+            <Button
+                variant="primary"
+                onClick={handleSubmit}
             >
                 Submit
             </Button>
         </Form>
-            
     )
 }
 
