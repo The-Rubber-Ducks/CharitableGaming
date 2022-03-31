@@ -1,10 +1,11 @@
+
 from ast import Index
 from flask import request, abort
 from application import app, fbase, RiotWatcher
 from .FirebaseFuncs.FirebaseFuncs import CurrentUserNotSet, UserAuthenticationError, UserTokenError
 from firebase_admin import auth, exceptions
 import json
-from flask_cors import CORS, cross_origin
+from flask_cors import cross_origin
 
 
 @app.route("/api/login", methods=['POST'])
@@ -22,7 +23,7 @@ def login():
             # Need to make these forms
             email = login_response['email']
             password = login_response['password']
-            authenticate = fbase.authenticate_user(email, password) 
+            authenticate = fbase.authenticate_user(email, password)
         except UserAuthenticationError:
             return abort(400)
         except KeyError:
@@ -50,8 +51,10 @@ def register():
         try:
             email = register_response['email'] # email input field goes here
             password = register_response['password'] # password input field goes here
+            confirmpassword = register_response['confirmpassword']
             gamerhandles = register_response['gamerhandles']
             charity = register_response['charity']
+            display_name = register_response['display_name']
 
             if not gamerhandles:
                 return abort(400)
@@ -60,7 +63,10 @@ def register():
                 for val in game.values():
                     if not val:
                         return abort(400)
-            fbase.add_new_user_email_and_password(email, password)
+
+            if password != confirmpassword:
+                return abort(400)
+            fbase.add_new_user_email_and_password(email, password, display_name)
             authenticate = fbase.authenticate_user(email, password)
 
             for game in gamerhandles:
@@ -82,7 +88,7 @@ def register():
         else:
             return  json.dumps({'success': True}), 200, {'ContentType':'application/json'}
 
-    return abort(400)
+    return abort(405)
 
 
 @app.route("/api/get_all_charities")
@@ -99,6 +105,7 @@ def get_all_charities():
 
 
 @app.route("/api/set_charity", methods=["POST"])
+@cross_origin()
 def set_charity():
     """
     Sets a user's charity via the charity name.
@@ -121,7 +128,30 @@ def set_charity():
     return abort(405) 
 
 
+@app.route("/api/is_user_logged_in")
+@cross_origin()
+def is_user_logged_in():
+    """
+    Verifies if the user is logged in or not by verifying if there is a current user available in
+    the Firebase Funcs methods.
+    Returns JSON, Example:
+        {"logged_in":False}
+    """
+    if request.method == "GET":
+        logged_in = fbase.verify_user()
+        
+        if logged_in:
+            return  json.dumps({'logged_in': True}), 200, {'ContentType':'application/json'}
+
+        else:
+            return  json.dumps({'logged_in': False}), 200, {'ContentType':'application/json'}
+
+
+    return abort(405)
+
+
 @app.route("/api/logout")
+@cross_origin()
 def logout():
     """
     Logs out a user by revoking their refresh tokens, and dumping their data 
@@ -138,6 +168,7 @@ def logout():
         
 
 @app.route("/api/get_user_league_games")
+@cross_origin()
 def get_user_league_games():
     """
     Returns the user's most recent 5 League of Legends games.
@@ -145,9 +176,7 @@ def get_user_league_games():
     """
     if request.method == "GET":
         try:
-            fbase.authenticate_user("mob@example.com", "password")
             summoner_name, region = fbase.get_user_handle_and_region()
-            #region = "North America"
             puid = RiotWatcher.get_puuid(summoner_name, region)
             last_five_matches = RiotWatcher.get_matchlist(puid, "North America", 5)
             stats = RiotWatcher.get_player_match_stats(puid, "North America", last_five_matches, "kills", "deaths", "assists", "win")
@@ -163,21 +192,21 @@ def get_user_league_games():
 
 
 @app.route("/api/get_leaderboard")
+@cross_origin()
 def get_leaderboard():
     """
     Returns the top 3 players with the most charity points.
     URL Example: http://localhost:8080/api/get_leaderboard?game=League_of_Legends
-
     Args:
         Requires a gamename.
-
     Returns a JSON, as an example:
         [{"topo": 692}, {"topo": 0}, {"topo": 0}]
     """
     if request.method == "GET":
-        game_name = request.args['game']
+        leader_response = request.get_json()
+        game_name = leader_response['game']
         game_name = game_name.replace('_', ' ')
-        num_choices = request.args['num_of_choices']
+        num_choices = leader_response['num_of_choices']
         leaderboard = fbase.get_leaderboard(num_choices, game_name)
         return json.dumps(leaderboard), 200, {'ContentType':'application/json'}
 
@@ -185,6 +214,7 @@ def get_leaderboard():
 
 
 @app.route("/api/get_user_data")
+@cross_origin()
 def get_user_data():
     """
     Gets the currently logged in user's data.
