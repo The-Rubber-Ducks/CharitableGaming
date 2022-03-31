@@ -1,20 +1,18 @@
+import Container from "react-bootstrap/Container";
+import Row from "react-bootstrap/Row";
 import {useState, useEffect} from 'react';
 import CharityList from './CharityList';
+
 const Charities = () => {
     const [ searchTerm, setSearchTerm ] = useState("");
     const [ searchResults, setSearchResults ] = useState([]);
 
     // fetch list of all charities
-    // const { data: charities, isPending, error } = useFetch('http://localhost:8000/charities');
     const [charities, setCharities] = useState(null);
     const [charitiesPending, setCharitiesPending] = useState(true);
     const [charitiesError, setCharitiesError] = useState(null);
 
     // user info
-    const [username, setUsername] = useState(null);
-    const [createdAt, setCreatedAt] = useState(null);
-    const [charityPoints, setCharityPoints] = useState(null);
-    const [userRegion, setUserRegion] = useState(null);
     const [selectedCharity, setSelectedCharity] = useState(null);
 
     useEffect(() => {
@@ -24,12 +22,7 @@ const Charities = () => {
                 return res.json();
             })
             .then(user => {
-                setUsername(user.gamer_handle);
-                setCreatedAt(user.created_at);
-                setCharityPoints(user.charity_points);
-                setUserRegion(user.user_region);
                 setSelectedCharity(user.charity);
-
                 setCharitiesPending(false);
                 setCharitiesError(null);
             })
@@ -49,17 +42,13 @@ const Charities = () => {
         })
     }, []);
 
-    const handleUpdate = (id) => {
-        setSelectedCharity(id);
+    const handleUpdate = (name) => {
+        setSelectedCharity(name);
         fetch("https://charitable-gaming-server.herokuapp.com/api/set_charity", {
             method: "POST",
             headers: {"Content-Type": "application/json"},
             body: JSON.stringify({
-                "username": username,
-                "created_at": createdAt,
-                "charity_points": charityPoints,
-                "user_region": userRegion,
-                "charity": id
+                "charity_name": name
             })
         })
     };
@@ -78,10 +67,10 @@ const Charities = () => {
     };
 
     return (  
-        <div className="content">
-            <div className="charities-page-title">
+        <Container fluid="lg" className="content mb-5">
+            <Row className="mt-5 mb-3 text-center">
                 <h2>Charities List</h2>
-            </div>
+            </Row>
             { charitiesError && <div className="network-error-msg">{ charitiesError }</div> }
             { charitiesPending && <div className="">Loading...</div> }
             { selectedCharity && charities && 
@@ -93,7 +82,7 @@ const Charities = () => {
                 searchTerm={ searchTerm } 
                 handleSearch={ handleSearch }
             /> }
-        </div>
+        </Container>
     );
 }
  
