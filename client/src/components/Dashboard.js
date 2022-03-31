@@ -6,6 +6,8 @@ import Col from "react-bootstrap/Col";
 const Dashboard = () => {
 
     const [matches, setMatches] = useState([]);
+    const [userData, setUserData] = useState([]);
+    const [leaders, setLeaders] = useState([]);
     const [update, setUpdate] = useState(false);
 
     useEffect(() => {
@@ -16,8 +18,33 @@ const Dashboard = () => {
             .then(data => {
                 const stats = Object.values(data);
                 setMatches(stats);
+            })
+            .catch(error => {
+                console.log("Error getting match data.")
             });
-    }, [update]);
+
+            fetch('https://charitable-gaming-server.herokuapp.com/api/get_user_data')
+            .then(res => {
+                return res.json();
+            })
+            .then(data => {
+                setUserData(data);    
+            })
+            .catch(error => {
+                console.log("Error getting user data.")
+            });
+
+        fetch('https://charitable-gaming-server.herokuapp.com/api/get_leaderboard?game=League_of_Legends&num_of_choices=mini')
+            .then(res => {
+                return res.json();
+            })
+            .then(data => {
+                setUserData(data);    
+            })  
+            .catch(error => {
+                console.log("Error getting leaderboard data.")
+            })
+        }, []);
 
     return (  
         <div className="main-dashboard-container">
@@ -29,7 +56,6 @@ const Dashboard = () => {
                 <MatchList gameTitle={"League of Legends"} matches={matches}/>
             </div>
         </div>
-
     );
 }
  
