@@ -117,11 +117,58 @@ Example JSON output:
 
 ### api/get_leaderboard
 Method = GET.
-Returns the top donaters for the specified game, based on charity points
+Returns the top players for the specified game, based on charity points
+
+URL Args:
+    game: Include the specified game, i.e. League_of_Legends
+    num_of_players: The number of players, can choose 'mini' for 3, or 'complete' for all
+
+Example URL:
+/api/get_leaderboard?game=League_of_Legends&num_of_players=mini
 
 Example JSON output:
 ```
-[{"topo": 692}, {"topo": 0}, {"My Handle": 0}, {"topo": 0}, {"topo": 0}]
+[
+    {
+    "gamer_handle": "topo",
+    "display_name": "Goku",
+    "charity_points": 692 
+    }, 
+    {
+    "gamer_handle": "opot",
+    "display_name": "Frieza",
+    "charity_points": 200
+    },
+    {
+    "gamer_handle": "Yugi",
+    "display_name": "Gohan",
+    "charity_points": 50
+    }
+]
+```
+
+---
+
+### api/get_global_leaderboard
+Method = GET.
+Returns the top 3 players across all games, based on charity points
+
+Example JSON output:
+```
+[
+    {
+    "display_name": "Goku",
+    "charity_points": 692 
+    }, 
+    {
+    "display_name": "Frieza",
+    "charity_points": 200
+    },
+    {
+    "display_name": "Gohan",
+    "charity_points": 50
+    }
+]
 ```
 
 ---

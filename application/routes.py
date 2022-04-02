@@ -195,23 +195,65 @@ def get_user_league_games():
 @cross_origin()
 def get_leaderboard():
     """
-    Returns the top 3 players with the most charity points.
-    URL Example: http://localhost:8080/api/get_leaderboard?game=League_of_Legends
+    Returns the top players with the most charity points.
+    Option to return either the top 3 (num_of_players=mini) or all (num_of_players=complete)
 
     Args:
-        Requires a gamename.
+    https://charitable-gaming-server.herokuapp.com/api/get_leaderboard?game=League_of_Legends&num_of_players=mini
+        "game" argument
+        "num_of_players" argument -> Can either be 'mini' which will return the top 3 players, or 'complete' which will return all
 
-    Returns a JSON, as an example:
-        [{"topo": 692}, {"topo": 0}, {"topo": 0}]
+    Returns a JSON, as an example, that contains the leaderboard for that game:
+            [{
+                "gamer_handle": "topo",
+                "display_name": "Goku",
+                "charity_points": 692 
+            }, 
+            {
+                "gamer_handle": "opot",
+                "display_name": "Frieza",
+                "charity_points": 200
+            },
+            {
+                "gamer_handle": "Yugi",
+                "display_name": "Gohan",
+                "charity_points": 50
+            }]
     """
-    if request.method == "GET":
-        leader_response = request.get_json()
-        game_name = leader_response['game']
-        game_name = game_name.replace('_', ' ')
-        num_choices = leader_response['num_of_choices']
-        leaderboard = fbase.get_leaderboard(num_choices, game_name)
+    if request.method == "GET" and request.args:
+        game_choice = request.args.get('game')
+        num_of_choices = request.args.get('num_of_players')
+        game_choice = game_choice.replace('_', ' ')
+        leaderboard = fbase.get_leaderboard(num_of_choices, game_choice)
         return json.dumps(leaderboard), 200, {'ContentType':'application/json'}
 
+    return abort(405)
+
+
+@app.route("/api/get_global_leaderboard")
+@cross_origin()
+def get_global_leaderboard():
+    """
+    Returns the top 3 players with the most charity points across all games.
+
+    Returns a JSON array as follows: 
+            [{
+                "display_name": "Goku",
+                "charity_points": 692 
+            }, 
+            {
+                "display_name": "Frieza",
+                "charity_points": 200
+            },
+            {
+                "display_name": "Gohan",
+                "charity_points": 50
+            }]
+    """
+    if request.method == "GET":
+        leaderboard = fbase.get_global_leaderboard()
+        return json.dumps(leaderboard), 200, {'ContentType': 'application/json'}
+    
     return abort(405)
 
 
