@@ -39,10 +39,8 @@ from dotenv import load_dotenv
 from os import environ, path
 import copy
 
-basedir = path.abspath(path.dirname(__file__))
-load_dotenv(path.join(basedir, ".env"))
-
-API_KEY = environ.get('API_KEY')
+FIREBASE_API_KEY = environ.get('FIREBASE_API_KEY')
+print(f"This is your API key: {FIREBASE_API_KEY}")
 
 class CurrentUserNotSet(Exception):
 	"""
@@ -207,7 +205,7 @@ class FirebaseFuncs:
             "password": password,
             "returnSecureToken": True
 		}
-		result = requests.post(LOGIN_ENDPOINT + API_KEY, json=data)
+		result = requests.post(LOGIN_ENDPOINT + FIREBASE_API_KEY, json=data)
 
 		if not result.ok:
 			error = result.json()['error']
