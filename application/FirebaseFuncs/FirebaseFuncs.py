@@ -37,9 +37,10 @@ from functools import wraps
 import requests
 from dotenv import load_dotenv
 from os import environ, path
-import copy
+import json
 
 FIREBASE_JSON = environ.get('FIREBASE_JSON')
+FIREBASE_JSON = json.loads(FIREBASE_JSON)
 FIREBASE_API_KEY = environ.get('FIREBASE_API_KEY')
 print(f"This is your API key: {FIREBASE_API_KEY}")
 
