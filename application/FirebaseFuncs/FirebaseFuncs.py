@@ -39,6 +39,7 @@ from dotenv import load_dotenv
 from os import environ, path
 import copy
 
+FIREBASE_JSON = environ.get('FIREBASE_JSON')
 FIREBASE_API_KEY = environ.get('FIREBASE_API_KEY')
 print(f"This is your API key: {FIREBASE_API_KEY}")
 
@@ -127,7 +128,8 @@ class FirebaseFuncs:
 		Initializes a connection to the database when this object is created.
 		Initializes the current user to None.
 		"""
-		self._cred = firebase_admin.credentials.Certificate('key.json')
+        print(f"This is your FIREBASE_JSON key: {FIREBASE_JSON}")
+		self._cred = firebase_admin.credentials.Certificate(FIREBASE_JSON)
 		self._db_app = firebase_admin.initialize_app(self._cred)
 		self._db = firestore.client()
 		self._auth = auth
